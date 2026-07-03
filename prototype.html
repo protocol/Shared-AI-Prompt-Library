@@ -1,0 +1,1799 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shared AI Prompt Library — PL Infra</title>
+  <meta name="description" content="PL Infra's shared AI prompt library — browse, filter, copy, and upvote approved prompts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230090ff'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <style>
+/* =========================================================
+   PL Design System — tokens + components (from preview/styles.css)
+   ========================================================= */
+:root {
+  --bg-base:            #ffffff;
+  --bg-soft:            #f7f9fc;
+  --bg-subtle:          #eef2f8;
+  --bg-brand-soft:      #eff6ff;
+  --bg-brand-subtle:    #dbeafe;
+  --fg-primary:         #0a0c11;
+  --fg-secondary:       #455468;
+  --fg-tertiary:        #5e718d;
+  --fg-quaternary:      #8897ae;
+  --fg-disabled:        #afbaca;
+  --fg-on-brand:        #ffffff;
+  --brand-50:           #eff6ff;
+  --brand-100:          #dbeafe;
+  --brand-200:          #bfdbfe;
+  --brand-300:          #93c5fd;
+  --brand-400:          #60a5fa;
+  --brand-500:          #0090ff;
+  --brand-600:          #0070cc;
+  --brand-700:          #005599;
+  --brand-800:          #003d73;
+  --brand-900:          #002952;
+  /* PL green accents */
+  --green-500:          #12b886;
+  --green-600:          #0ca678;
+  --green-700:          #099268;
+  --green-soft:         #e6f7f0;
+  --green-subtle:       #c3f0dd;
+  --green-border:       #a7e8cf;
+  --green-fg:           #0a6e50;
+  --border-subtle:      rgba(30,64,124,0.12);
+  --border-muted:       rgba(30,64,124,0.24);
+  --border-strong:      #3d4a5c;
+  --border-brand:       #0090ff;
+  --border-brand-soft:  #bfdbfe;
+  --tier-l1-bg: #eff6ff; --tier-l1-fg: #005599;
+  --tier-l2-bg: #bfdbfe; --tier-l2-fg: #003d73;
+  --tier-l3-bg: #0090ff; --tier-l3-fg: #ffffff;
+  --tier-l4-bg: #003d73; --tier-l4-fg: #ffffff;
+  --status-draft-bg:      #f1f5f9; --status-draft-fg:      #475569;
+  --status-approved-bg:   #e6f7f0; --status-approved-fg:   #0a6e50;
+  --status-deprecated-bg: #e2e8f0; --status-deprecated-fg: #64748b;
+  --space-1:2px; --space-2:4px; --space-3:8px; --space-4:12px;
+  --space-5:16px; --space-6:24px; --space-7:32px; --space-8:48px;
+  --space-9:64px; --space-10:80px;
+  --radius-sm:6px; --radius-md:10px; --radius-lg:12px;
+  --radius-xl:16px; --radius-2xl:20px; --radius-pill:9999px;
+  --shadow-xs: 0 1px 2px rgba(14,15,17,.06);
+  --shadow-sm: 0 1px 2px rgba(14,15,17,.06),0 1px 3px rgba(14,15,17,.10);
+  --shadow-md: 0 2px 4px -1px rgba(14,15,17,.06),0 4px 6px -1px rgba(14,15,17,.10);
+  --shadow-lg: 0 4px 6px -2px rgba(14,15,17,.06),0 10px 15px -3px rgba(14,15,17,.10);
+  --font-sans: "Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono: ui-monospace,SFMono-Regular,"SF Mono",Menlo,Monaco,Consolas,monospace;
+  --sidebar-width:320px; --topbar-height:64px;
+}
+:root[data-theme="dark"] {
+  --bg-base:#0a0c11; --bg-soft:#0f1320; --bg-subtle:#1a2030;
+  --bg-brand-soft:#0a2240; --bg-brand-subtle:#0e3060;
+  --fg-primary:#f0f3f9; --fg-secondary:#afbaca; --fg-tertiary:#8897ae;
+  --fg-quaternary:#5e718d; --fg-disabled:#455468;
+  --border-subtle:rgba(180,200,230,.10); --border-muted:rgba(180,200,230,.18);
+  --border-strong:#5e718d; --border-brand-soft:#1a4480;
+  --brand-50:#0a2240; --brand-100:#0e3060;
+  --green-soft:#0c2e22; --green-subtle:#12513b; --green-border:#12513b; --green-fg:#5fdcae;
+  --tier-l1-bg:#0e3060; --tier-l1-fg:#93c5fd;
+  --tier-l2-bg:#1a4480; --tier-l2-fg:#bfdbfe;
+  --tier-l3-bg:#0090ff; --tier-l3-fg:#ffffff;
+  --tier-l4-bg:#002952; --tier-l4-fg:#bfdbfe;
+  --status-draft-bg:#1f2937; --status-draft-fg:#94a3b8;
+  --status-approved-bg:#0c2e22; --status-approved-fg:#5fdcae;
+  --status-deprecated-bg:#1f2937; --status-deprecated-fg:#64748b;
+  --shadow-xs:0 1px 2px rgba(0,0,0,.40);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.40),0 1px 3px rgba(0,0,0,.50);
+  --shadow-md:0 2px 4px -1px rgba(0,0,0,.40),0 4px 6px -1px rgba(0,0,0,.50);
+  --shadow-lg:0 4px 6px -2px rgba(0,0,0,.40),0 10px 15px -3px rgba(0,0,0,.50);
+}
+
+/* Reset */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;line-height:22px;letter-spacing:-.01em;
+  color:var(--fg-primary);background:var(--bg-soft);-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+a{color:var(--brand-600);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* =========================================================
+   Topbar
+   ========================================================= */
+.topbar{position:sticky;top:0;z-index:10;
+  background:color-mix(in srgb,var(--bg-base) 85%,transparent);
+  backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--border-subtle)}
+.topbar-inner{max-width:1440px;margin:0 auto;height:var(--topbar-height);
+  padding:0 var(--space-6);display:flex;align-items:center;
+  justify-content:space-between;gap:var(--space-5)}
+.brand{display:flex;align-items:center;gap:var(--space-4);text-decoration:none;color:inherit}
+.brand:hover{text-decoration:none}
+.brand-mark{color:var(--brand-500);display:inline-flex}
+.brand-text{display:flex;flex-direction:column;line-height:1.2}
+.brand-name{font-weight:600;font-size:16px;letter-spacing:-.02em;color:var(--fg-primary)}
+.brand-sub{font-size:12px;color:var(--fg-tertiary)}
+.topbar-actions{display:flex;align-items:center;gap:var(--space-3)}
+.topbar-nav{display:flex;gap:var(--space-2);align-items:center;margin-left:var(--space-5)}
+.nav-link{display:inline-flex;align-items:center;height:36px;padding:0 var(--space-4);
+  border-radius:var(--radius-md);font-size:13px;font-weight:500;color:var(--fg-secondary);
+  text-decoration:none;transition:background 120ms ease,color 120ms ease;border:none;background:transparent}
+.nav-link:hover{background:var(--bg-subtle);color:var(--fg-primary);text-decoration:none}
+.nav-link.is-active{background:var(--bg-brand-soft);color:var(--brand-700)}
+@media(max-width:760px){.topbar-nav{display:none}}
+.link-button{display:inline-flex;align-items:center;gap:var(--space-3);height:36px;
+  padding:0 var(--space-4);border-radius:var(--radius-md);color:var(--fg-secondary);
+  border:1px solid var(--border-subtle);background:var(--bg-base);text-decoration:none;
+  font-size:13px;font-weight:500;transition:background 120ms ease,border-color 120ms ease,color 120ms ease}
+.link-button:hover{background:var(--bg-subtle);color:var(--fg-primary);text-decoration:none}
+.link-button.primary{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+.link-button.primary:hover{background:var(--brand-600);border-color:var(--brand-600)}
+.identity-chip{display:inline-flex;align-items:center;gap:var(--space-2);height:36px;
+  padding:0 var(--space-4);border-radius:var(--radius-pill);font-size:13px;font-weight:500;
+  color:var(--green-fg);background:var(--green-soft);border:1px solid var(--green-border)}
+.identity-chip:hover{background:var(--green-subtle)}
+.identity-dot{width:8px;height:8px;border-radius:50%;background:var(--green-500);flex-shrink:0}
+@media(max-width:640px){.identity-chip .identity-label{display:none}}
+.icon-button{width:36px;height:36px;border-radius:var(--radius-md);
+  border:1px solid var(--border-subtle);background:var(--bg-base);color:var(--fg-secondary);
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background 120ms ease,border-color 120ms ease,color 120ms ease}
+.icon-button:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+.theme-icon-moon{display:none}
+:root[data-theme="dark"] .theme-icon-sun{display:none}
+:root[data-theme="dark"] .theme-icon-moon{display:inline}
+
+/* =========================================================
+   Hero
+   ========================================================= */
+.hero{background:linear-gradient(135deg,var(--bg-brand-soft) 0%,var(--bg-base) 60%);
+  border-bottom:1px solid var(--border-subtle)}
+.hero-inner{max-width:1440px;margin:0 auto;padding:var(--space-8) var(--space-6) var(--space-7);
+  display:grid;grid-template-columns:1.4fr 1fr;gap:var(--space-8);align-items:center}
+.hero h1{margin:0 0 var(--space-4);font-size:36px;line-height:1.15;letter-spacing:-.02em;
+  font-weight:700;color:var(--fg-primary)}
+.hero .tagline{font-size:16px;line-height:1.5;color:var(--fg-secondary);margin:0 0 var(--space-5)}
+.hero-stats{display:flex;gap:var(--space-6);flex-wrap:wrap}
+.hero-stat{display:flex;flex-direction:column;gap:var(--space-1);min-width:80px}
+.hero-stat-num{font-size:24px;font-weight:700;color:var(--brand-600);letter-spacing:-.02em}
+.hero-stat-label{font-size:12px;color:var(--fg-tertiary);text-transform:uppercase;letter-spacing:.05em}
+.hero-stats--single{gap:var(--space-7);align-items:flex-end;row-gap:var(--space-4)}
+.hero-stats--single .hero-stat{min-width:90px}
+.hero-stats--single .hero-stat .hero-stat-num{font-size:26px}
+.hero-stats--single .hero-stat .hero-stat-label{font-size:11px}
+.hero-stats--single .hero-stat:first-child .hero-stat-num{font-size:42px;color:var(--brand-700);line-height:1.1}
+.hero-art{background:var(--bg-base);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--shadow-md)}
+.hero-art-title{font-size:12px;color:var(--fg-tertiary);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:var(--space-3)}
+.hero-formula{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center;
+  font-size:14px;font-weight:600}
+.formula-chip{padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);
+  background:var(--bg-brand-soft);color:var(--brand-700);border:1px solid var(--border-brand-soft)}
+.formula-op{color:var(--fg-tertiary);font-weight:400}
+.formula-eq{color:var(--green-600)}
+.formula-out{padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);
+  background:var(--green-500);color:#fff}
+@media(max-width:900px){.hero-inner{grid-template-columns:1fr;gap:var(--space-6)}}
+
+/* =========================================================
+   Layout
+   ========================================================= */
+.layout{max-width:1440px;margin:0 auto;padding:var(--space-6);
+  display:grid;grid-template-columns:var(--sidebar-width) 1fr;gap:var(--space-7)}
+@media(max-width:1024px){.layout{grid-template-columns:1fr}.sidebar{position:static}}
+.sidebar{position:sticky;top:calc(var(--topbar-height) + var(--space-5));align-self:start;
+  display:flex;flex-direction:column;gap:var(--space-4);
+  max-height:calc(100vh - var(--topbar-height) - var(--space-9));overflow-y:auto}
+.filter-card{background:var(--bg-base);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);padding:var(--space-4)}
+.filter-card h3{margin:0 0 var(--space-3);font-size:12px;text-transform:uppercase;
+  letter-spacing:.06em;color:var(--fg-tertiary);font-weight:600}
+.filter-list{display:flex;flex-direction:column;gap:var(--space-2)}
+.filter-item{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--space-2) var(--space-3);border-radius:var(--radius-sm);
+  cursor:pointer;font-size:13px;color:var(--fg-secondary)}
+.filter-item:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+.filter-item input{margin:0;accent-color:var(--brand-500)}
+.filter-item-label{display:flex;align-items:center;gap:var(--space-3);flex:1}
+.filter-item-count{font-size:12px;color:var(--fg-quaternary);font-variant-numeric:tabular-nums}
+.ghost-button{display:inline-flex;align-items:center;gap:var(--space-2);height:32px;
+  padding:0 var(--space-3);font-size:13px;color:var(--fg-tertiary);background:transparent;
+  border:none;border-radius:var(--radius-md)}
+.ghost-button:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+
+/* =========================================================
+   Content + search
+   ========================================================= */
+.content{min-width:0}
+.content-header{margin-bottom:var(--space-5)}
+.search-wrap{position:relative;margin-bottom:var(--space-4)}
+.search-input{width:100%;height:48px;padding:0 var(--space-7) 0 48px;font-size:15px;
+  background:var(--bg-base);color:var(--fg-primary);border:1.5px solid var(--border-subtle);
+  border-radius:var(--radius-lg);outline:none;
+  transition:border-color 120ms ease,box-shadow 120ms ease}
+.search-input:focus{border-color:var(--brand-500);box-shadow:0 0 0 4px var(--bg-brand-subtle)}
+.search-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--fg-tertiary)}
+.search-kbd{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+kbd{font-family:var(--font-mono);font-size:11px;background:var(--bg-subtle);
+  border:1px solid var(--border-subtle);border-bottom-width:2px;border-radius:var(--radius-sm);
+  padding:1px 6px;color:var(--fg-secondary)}
+.results-row{display:flex;align-items:center;justify-content:space-between;
+  gap:var(--space-4);flex-wrap:wrap}
+.active-chips{display:flex;gap:var(--space-2);flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:var(--space-2);padding:4px var(--space-3);
+  border-radius:var(--radius-pill);background:var(--bg-brand-soft);color:var(--brand-700);
+  border:1px solid var(--border-brand-soft);font-size:12px;font-weight:500}
+.chip button{background:transparent;border:none;padding:0;color:inherit;line-height:0;display:inline-flex}
+.result-meta{display:inline-flex;align-items:center;gap:var(--space-3);
+  color:var(--fg-tertiary);font-size:13px}
+.dot{color:var(--fg-disabled)}
+.select-wrap{display:inline-flex;align-items:center;gap:var(--space-2)}
+.select-wrap select{background:var(--bg-base);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-md);padding:4px var(--space-3);font-size:13px;color:var(--fg-primary)}
+
+/* =========================================================
+   Category sections
+   ========================================================= */
+.cat-section{margin-bottom:var(--space-7)}
+.cat-section-head{display:flex;align-items:center;gap:var(--space-3);margin:0 0 var(--space-4);
+  padding-left:var(--space-4);border-left:3px solid var(--green-500)}
+.cat-section-title{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--fg-primary);margin:0}
+.cat-section-count{font-size:12px;color:var(--fg-tertiary);background:var(--bg-subtle);
+  padding:2px 10px;border-radius:var(--radius-pill);font-variant-numeric:tabular-nums}
+.cat-actions{margin-left:auto;display:flex;gap:var(--space-1)}
+.cat-toggle{font-size:12px;color:var(--fg-tertiary);background:transparent;border:none;
+  padding:4px var(--space-3);border-radius:var(--radius-sm)}
+.cat-toggle:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+.bulk-bar{display:flex;justify-content:flex-end;gap:var(--space-2);margin-bottom:var(--space-4)}
+.bulk-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;
+  padding:6px var(--space-4);border-radius:var(--radius-md);background:var(--bg-base);
+  color:var(--fg-secondary);border:1px solid var(--border-subtle)}
+.bulk-btn:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+
+/* =========================================================
+   Prompt cards
+   ========================================================= */
+.prompt-list{display:flex;flex-direction:column;gap:var(--space-5)}
+.prompt-card{background:var(--bg-base);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-lg);padding:var(--space-5);
+  transition:border-color 120ms ease,box-shadow 120ms ease}
+.prompt-card:hover{border-color:var(--border-muted);box-shadow:var(--shadow-sm)}
+.prompt-card.is-example{background:var(--bg-soft)}
+.prompt-head{display:flex;align-items:flex-start;justify-content:space-between;
+  gap:var(--space-4);margin-bottom:var(--space-3)}
+.prompt-card.is-collapsible .prompt-head{cursor:pointer;margin-bottom:0}
+.prompt-card.is-collapsible.is-open .prompt-head{margin-bottom:var(--space-3)}
+.prompt-title-wrap{display:flex;align-items:center;gap:var(--space-3);min-width:0}
+.example-chevron{color:var(--fg-tertiary);flex-shrink:0;transition:transform 150ms ease}
+.prompt-card.is-open .example-chevron{transform:rotate(90deg)}
+.prompt-title{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--fg-primary)}
+.prompt-body{display:none}
+.prompt-card.is-open .prompt-body,.prompt-card:not(.is-collapsible) .prompt-body{display:block}
+.prompt-badges{display:flex;gap:var(--space-2);flex-wrap:wrap;flex-shrink:0}
+.badge{display:inline-flex;align-items:center;gap:var(--space-2);padding:3px var(--space-3);
+  font-size:11px;font-weight:600;letter-spacing:.03em;border-radius:var(--radius-pill);
+  text-transform:uppercase}
+.badge-category{background:var(--bg-subtle);color:var(--fg-secondary)}
+.badge-example{background:var(--green-soft);color:var(--green-fg)}
+.badge-sensitivity[data-tier="L1"]{background:var(--tier-l1-bg);color:var(--tier-l1-fg)}
+.badge-sensitivity[data-tier="L2"]{background:var(--tier-l2-bg);color:var(--tier-l2-fg)}
+.badge-sensitivity[data-tier="L3"]{background:var(--tier-l3-bg);color:var(--tier-l3-fg)}
+.badge-sensitivity[data-tier="L4"]{background:var(--tier-l4-bg);color:var(--tier-l4-fg)}
+.badge-status[data-status="Draft"],.badge-status[data-status="Drafts"]{background:var(--status-draft-bg);color:var(--status-draft-fg)}
+.badge-status[data-status="Approved"]{background:var(--status-approved-bg);color:var(--status-approved-fg)}
+.badge-status[data-status="Deprecated"]{background:var(--status-deprecated-bg);color:var(--status-deprecated-fg)}
+.prompt-meta{display:flex;flex-wrap:wrap;gap:var(--space-4);font-size:12px;
+  color:var(--fg-tertiary);margin-bottom:var(--space-4)}
+.prompt-meta strong{color:var(--fg-secondary);font-weight:500}
+.prompt-usecase{font-size:14px;color:var(--fg-secondary);margin:0 0 var(--space-4)}
+.prompt-section{margin-top:var(--space-4)}
+.prompt-section-label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--fg-tertiary);font-weight:600;margin-bottom:var(--space-2)}
+.prompt-text{font-family:var(--font-mono);font-size:12.5px;line-height:1.6;
+  background:var(--bg-subtle);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-md);padding:var(--space-4);white-space:pre-wrap;
+  color:var(--fg-primary);max-height:160px;overflow:hidden;position:relative;
+  cursor:pointer;transition:max-height 200ms ease}
+.prompt-text.expanded{max-height:2000px}
+.prompt-text::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;
+  background:linear-gradient(180deg,transparent,var(--bg-subtle));pointer-events:none;
+  transition:opacity 200ms ease}
+.prompt-text.expanded::after{opacity:0}
+.prompt-example{font-size:13px;line-height:1.55;color:var(--fg-secondary);
+  background:var(--green-soft);border-left:3px solid var(--green-500);
+  padding:var(--space-3) var(--space-4);border-radius:0 var(--radius-md) var(--radius-md) 0;margin:0}
+.prompt-tags{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-4)}
+.tag{font-size:11px;padding:2px var(--space-3);border-radius:var(--radius-pill);
+  background:var(--bg-subtle);color:var(--fg-tertiary)}
+.prompt-notes{font-size:12.5px;color:var(--fg-tertiary);margin-top:var(--space-4);
+  padding:var(--space-3) var(--space-4);background:var(--bg-subtle);border-radius:var(--radius-md)}
+
+/* =========================================================
+   Actions bar + Vote button
+   ========================================================= */
+.prompt-actions{display:flex;align-items:center;gap:var(--space-3);margin-top:var(--space-4);
+  padding-top:var(--space-4);border-top:1px solid var(--border-subtle);flex-wrap:wrap}
+.actions-left{display:flex;align-items:center;gap:var(--space-3);flex:1;flex-wrap:wrap}
+.action-btn{display:inline-flex;align-items:center;gap:var(--space-2);font-size:13px;
+  padding:6px var(--space-3);border-radius:var(--radius-md);background:var(--bg-base);
+  color:var(--fg-secondary);border:1px solid var(--border-subtle);cursor:pointer}
+.action-btn:hover{background:var(--bg-subtle);color:var(--fg-primary)}
+.action-btn.primary{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+.action-btn.primary:hover{background:var(--brand-600);border-color:var(--brand-600)}
+.action-btn.danger:hover{background:#fff0f0;color:#c92a2a;border-color:#ffc9c9}
+:root[data-theme="dark"] .action-btn.danger:hover{background:#2e1414;color:#ff8787;border-color:#5c2626}
+
+/* Vote button */
+.vote-btn{display:inline-flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:var(--radius-pill);font-size:13px;font-weight:600;
+  background:var(--bg-base);color:var(--fg-secondary);border:1px solid var(--border-subtle);
+  cursor:pointer;transition:background 120ms ease,color 120ms ease,border-color 120ms ease,transform 80ms ease;
+  user-select:none}
+.vote-btn:hover{background:var(--bg-brand-soft);color:var(--brand-700);border-color:var(--border-brand-soft)}
+.vote-btn.voted{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+.vote-btn.voted:hover{background:var(--brand-600);border-color:var(--brand-600)}
+.vote-btn:active{transform:scale(.96)}
+.vote-count{font-variant-numeric:tabular-nums;min-width:16px;text-align:center}
+
+/* Feedback button (green accent) */
+.feedback-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;
+  padding:6px var(--space-3);border-radius:var(--radius-md);background:var(--green-soft);
+  color:var(--green-fg);border:1px solid var(--green-border);cursor:pointer}
+.feedback-btn:hover{background:var(--green-subtle)}
+
+/* Vote rank badge on card (top-right corner) */
+.rank-badge{display:inline-flex;align-items:center;gap:4px;
+  padding:3px 10px;border-radius:var(--radius-pill);font-size:11px;font-weight:700;
+  background:var(--bg-brand-soft);color:var(--brand-700);border:1px solid var(--border-brand-soft);
+  letter-spacing:.02em}
+.rank-badge svg{flex-shrink:0}
+
+/* =========================================================
+   Comments / feedback
+   ========================================================= */
+.feedback-panel{margin-top:var(--space-4);padding-top:var(--space-4);
+  border-top:1px dashed var(--border-muted)}
+.feedback-panel[hidden]{display:none}
+.comment{padding:var(--space-3) 0;border-bottom:1px solid var(--border-subtle)}
+.comment:last-child{border-bottom:none}
+.comment-head{display:flex;align-items:baseline;gap:var(--space-3);margin-bottom:var(--space-1)}
+.comment-author{font-weight:600;font-size:13px;color:var(--green-fg)}
+.comment-meta{font-size:11px;color:var(--fg-quaternary)}
+.comment-body{font-size:13px;color:var(--fg-secondary);white-space:pre-wrap}
+.comment-actions{display:flex;align-items:center;gap:var(--space-4);margin-top:6px}
+.comment-reply-btn{font-size:12px;color:var(--brand-600);background:none;border:none;padding:0}
+.comment-reply-btn:hover{text-decoration:underline}
+.comment-edit-btn,.comment-del-btn{font-size:12px;background:none;border:none;padding:0;color:var(--fg-tertiary)}
+.comment-edit-btn:hover{color:var(--brand-600);text-decoration:underline}
+.comment-del-btn:hover{color:#c92a2a;text-decoration:underline}
+:root[data-theme="dark"] .comment-del-btn:hover{color:#ff8787}
+.comment-vote{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;
+  background:transparent;color:var(--fg-tertiary);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-pill);padding:2px 10px;transition:background 120ms ease,color 120ms ease,border-color 120ms ease}
+.comment-vote:hover{background:var(--bg-brand-soft);color:var(--brand-700);border-color:var(--border-brand-soft)}
+.comment-vote.voted{background:var(--brand-500);color:#fff;border-color:var(--brand-500)}
+.comment-vote .cv-count{font-variant-numeric:tabular-nums;min-width:8px;text-align:center}
+.comment-replies{margin-left:var(--space-5);padding-left:var(--space-4);
+  border-left:2px solid var(--border-subtle);margin-top:var(--space-2)}
+.comment-form{display:flex;flex-direction:column;gap:var(--space-2);margin-top:var(--space-3)}
+.comment-form textarea{width:100%;min-height:56px;resize:vertical;padding:8px 12px;font-size:13px;
+  background:var(--bg-base);color:var(--fg-primary);border:1px solid var(--border-muted);
+  border-radius:var(--radius-md);outline:none}
+.comment-form textarea:focus{border-color:var(--green-500);box-shadow:0 0 0 3px var(--green-soft)}
+.comment-form-row{display:flex;justify-content:space-between;align-items:center;gap:var(--space-3)}
+.comment-as{font-size:12px;color:var(--fg-tertiary)}
+.comment-empty{font-size:13px;color:var(--fg-tertiary);font-style:italic;margin:0 0 var(--space-2)}
+
+/* =========================================================
+   Modal
+   ========================================================= */
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,12,17,.5);
+  display:flex;align-items:flex-start;justify-content:center;padding:var(--space-7) var(--space-5);
+  z-index:200;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 150ms ease}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{background:var(--bg-base);border:1px solid var(--border-subtle);border-radius:var(--radius-xl);
+  box-shadow:var(--shadow-lg);width:100%;max-width:700px;margin:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--space-5) var(--space-6);border-bottom:1px solid var(--border-subtle);
+  position:sticky;top:0;background:var(--bg-base);border-radius:var(--radius-xl) var(--radius-xl) 0 0;z-index:1}
+.modal-title{font-size:18px;font-weight:700;margin:0}
+.modal-body{padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4)}
+.modal-foot{padding:var(--space-5) var(--space-6);border-top:1px solid var(--border-subtle);
+  display:flex;justify-content:flex-end;gap:var(--space-3);flex-wrap:wrap}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--fg-secondary);margin-bottom:var(--space-2)}
+.field .req{color:#e03131}
+.field input,.field select,.field textarea{width:100%;padding:9px 12px;font-size:14px;
+  background:var(--bg-base);color:var(--fg-primary);border:1px solid var(--border-muted);
+  border-radius:var(--radius-md);outline:none;transition:border-color 120ms ease,box-shadow 120ms ease}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand-500);box-shadow:0 0 0 3px var(--bg-brand-subtle)}
+.field textarea{resize:vertical;min-height:76px;font-family:inherit;line-height:1.5}
+.field textarea.mono{font-family:var(--font-mono);font-size:12.5px}
+.field-hint{font-size:12px;color:var(--fg-tertiary);margin-top:4px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+@media(max-width:560px){.field-row{grid-template-columns:1fr}}
+.field.err input,.field.err select,.field.err textarea{border-color:#e03131}
+
+/* =========================================================
+   Prompting Guide view
+   ========================================================= */
+.guide{max-width:920px;margin:0 auto;padding:var(--space-8) var(--space-6) var(--space-9)}
+.guide-intro{font-size:16px;line-height:1.6;color:var(--fg-secondary);
+  border-left:3px solid var(--green-500);padding-left:var(--space-5);margin:0 0 var(--space-7);font-style:italic}
+.guide h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0 0 var(--space-3)}
+.guide h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:var(--space-8) 0 var(--space-4);
+  padding-bottom:var(--space-2);border-bottom:1px solid var(--border-subtle)}
+.guide h3{font-size:15px;font-weight:600;margin:var(--space-5) 0 var(--space-2);color:var(--fg-primary)}
+.guide p{color:var(--fg-secondary);margin:0 0 var(--space-4)}
+.guide ul{color:var(--fg-secondary);margin:0 0 var(--space-4);padding-left:var(--space-6)}
+.guide li{margin-bottom:var(--space-2)}
+.guide table{width:100%;border-collapse:collapse;margin:0 0 var(--space-5);font-size:13.5px}
+.guide th,.guide td{text-align:left;padding:var(--space-3) var(--space-4);
+  border:1px solid var(--border-subtle);vertical-align:top}
+.guide th{background:var(--bg-subtle);font-weight:600;color:var(--fg-primary)}
+.guide td{color:var(--fg-secondary)}
+.guide blockquote{margin:0 0 var(--space-4);padding:var(--space-4) var(--space-5);
+  background:var(--bg-subtle);border-radius:var(--radius-md);border-left:3px solid var(--brand-400);
+  color:var(--fg-secondary);font-size:13.5px;line-height:1.6}
+.guide .callout-green{background:var(--green-soft);border-left-color:var(--green-500)}
+.guide code{font-family:var(--font-mono);font-size:12.5px;background:var(--bg-subtle);
+  padding:1px 6px;border-radius:var(--radius-sm)}
+.guide .weak{color:#c92a2a}.guide .strong{color:var(--green-700)}
+:root[data-theme="dark"] .guide .weak{color:#ff8787}
+
+/* =========================================================
+   Empty state + footer + toast
+   ========================================================= */
+.empty-state{background:var(--bg-base);border:1px dashed var(--border-muted);
+  border-radius:var(--radius-lg);padding:var(--space-9) var(--space-6);
+  text-align:center;color:var(--fg-tertiary)}
+.empty-state h3{margin:0 0 var(--space-2);color:var(--fg-primary);font-size:16px}
+.empty-state p{margin:0 0 var(--space-4);font-size:13px}
+.page-footer{margin-top:var(--space-9);padding-top:var(--space-6);
+  border-top:1px solid var(--border-subtle);font-size:12px;color:var(--fg-tertiary);
+  display:flex;flex-direction:column;gap:var(--space-3)}
+.toast{position:fixed;bottom:var(--space-6);left:50%;
+  transform:translateX(-50%) translateY(20px);padding:var(--space-3) var(--space-5);
+  background:var(--fg-primary);color:var(--bg-base);border-radius:var(--radius-md);
+  font-size:13px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;
+  transition:opacity 200ms ease,transform 200ms ease;z-index:300;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Leaderboard banner */
+.leaderboard-note{display:flex;align-items:center;gap:var(--space-3);
+  padding:var(--space-3) var(--space-4);background:var(--green-soft);
+  border:1px solid var(--green-border);border-radius:var(--radius-md);
+  font-size:13px;color:var(--green-fg);margin-bottom:var(--space-4)}
+.leaderboard-note svg{flex-shrink:0;color:var(--green-600)}
+  </style>
+</head>
+<body>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#" data-view="library">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28">
+          <rect width="32" height="32" rx="8" fill="currentColor"/>
+          <path d="M9 10h14M9 16h14M9 22h9" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">Shared AI Prompt Library</span>
+        <span class="brand-sub">PL Infra · approved prompts, shared with the team</span>
+      </span>
+    </a>
+
+    <nav class="topbar-nav" aria-label="Primary">
+      <button class="nav-link is-active" data-view="library" type="button">Library</button>
+      <button class="nav-link" data-view="guide" type="button">Prompting Guide</button>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="identity-chip" id="identityBtn" type="button" title="Change your display name">
+        <span class="identity-dot" aria-hidden="true"></span>
+        <span class="identity-label">You:</span> <span id="userName">—</span>
+      </button>
+      <button class="link-button primary" id="addPromptBtn" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add a prompt
+      </button>
+      <button class="icon-button" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>Shared AI Prompt Library</h1>
+      <p class="tagline">A growing collection of approved prompts for legal, finance, capital, ops, and beyond. Add, filter, copy, and upvote the prompts your team finds most useful.</p>
+      <div class="hero-stats hero-stats--single">
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statTotal">&mdash;</span>
+          <span class="hero-stat-label">Total prompts</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statApproved">&mdash;</span>
+          <span class="hero-stat-label">Approved</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statDrafts">&mdash;</span>
+          <span class="hero-stat-label">Drafts</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statVotes">&mdash;</span>
+          <span class="hero-stat-label">Total votes</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="hero-art-title">The Golden Prompting Formula</div>
+      <div class="hero-formula">
+        <span class="formula-chip">ROLE</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">CONTEXT</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">TASK</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">FORMAT</span>
+        <span class="formula-eq">=</span>
+        <span class="formula-out">Great Output</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LIBRARY VIEW ===================== -->
+<main class="layout" id="libraryView">
+  <!-- Sidebar filters -->
+  <aside class="sidebar" aria-label="Filters">
+    <div class="filter-card">
+      <h3>Category</h3>
+      <div class="filter-list" id="filterCategory"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Popularity</h3>
+      <div class="filter-list" id="filterPopularity"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Sensitivity</h3>
+      <div class="filter-list" id="filterSensitivity"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Status</h3>
+      <div class="filter-list" id="filterStatus"></div>
+    </div>
+    <button class="ghost-button" id="clearFilters" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+      Clear all filters
+    </button>
+  </aside>
+
+  <!-- Content -->
+  <section class="content">
+    <div class="content-header">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="mainSearch" class="search-input" placeholder="Search prompts by name, text, tag, or author…" aria-label="Search prompts" />
+        <kbd class="search-kbd" aria-hidden="true">/</kbd>
+      </div>
+      <div class="results-row">
+        <div id="activeChips" class="active-chips" aria-live="polite"></div>
+        <div class="result-meta">
+          <span id="resultCount">0 prompts</span>
+          <span class="dot" aria-hidden="true">·</span>
+          <label class="select-wrap">
+            Sort:
+            <select id="sortSelect" aria-label="Sort prompts">
+              <option value="votes">Most voted</option>
+              <option value="recent">Recently updated</option>
+              <option value="alpha">Alphabetical</option>
+              <option value="sensitivity">Sensitivity (low → high)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="leaderboardNote" class="leaderboard-note">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Upvote prompts you find useful and leave feedback &mdash; it helps the team discover what's working. Examples sit at the top of each category, collapsed.
+    </div>
+
+    <div class="bulk-bar" id="bulkBar">
+      <button class="bulk-btn" data-action="expand-all" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 13 5 5 5-5M7 6l5 5 5-5"/></svg>
+        Expand all
+      </button>
+      <button class="bulk-btn" data-action="collapse-all" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 5-5 5 5M7 18l5-5 5 5"/></svg>
+        Collapse all
+      </button>
+    </div>
+
+    <div id="promptSections"></div>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <h3>No prompts match those filters</h3>
+      <p>Try clearing a filter or broadening your search.</p>
+      <button class="action-btn" type="button" onclick="document.getElementById('clearFilters').click()">Clear all filters</button>
+    </div>
+
+    <footer class="page-footer">
+      <p><strong>Living library.</strong> To contribute, use the Add a prompt button up top. New and edited prompts sync to the shared Google Sheet (or export as a <code>prompts.json</code> entry when offline). For prompting techniques, open the <button class="nav-link" data-view="guide" type="button" style="height:auto;padding:0;color:var(--brand-600)">Prompting Guide</button>.</p>
+      <div><button class="ghost-button" id="exportJsonBtn" type="button">Export all prompts as prompts.json</button></div>
+    </footer>
+  </section>
+</main>
+
+<!-- ===================== GUIDE VIEW ===================== -->
+<main class="guide" id="guideView" hidden>
+  <h1>Prompting Guide</h1>
+  <p class="guide-intro">An AI tool is only as good as the instruction you give it. A vague prompt gets a generic answer. A precise, context-rich prompt gets a polished, ready-to-use response. The difference is your prompt.</p>
+
+  <h2>1. Where AI is already winning</h2>
+  <p>Most teams are already using AI for one or more of these. Naming them out loud helps you spot where else AI can plug in:</p>
+  <ul>
+    <li><strong>Contracts &amp; agreements</strong> — draft, review, redline, summarize; extract key terms and flag unusual clauses.</li>
+    <li><strong>Response drafting</strong> — professional emails, letters, replies; routine through sensitive.</li>
+    <li><strong>Diligence &amp; KYC</strong> — determine document requirements, draft response emails, manage certification letters.</li>
+    <li><strong>Special projects</strong> — research, summarize, draft memos, produce first-pass deliverables for complex work.</li>
+    <li><strong>Process &amp; admin</strong> — checklists, templates, trackers, process documentation for repeatable workflows.</li>
+    <li><strong>Proofreading &amp; polish</strong> — refine tone, check consistency, restructure arguments, catch errors before send.</li>
+  </ul>
+
+  <h2>2. The Golden Prompting Formula</h2>
+  <p><strong>ROLE + CONTEXT + TASK + FORMAT = Great Output</strong></p>
+  <table>
+    <thead><tr><th>Component</th><th>Question it answers</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ROLE</strong></td><td>Who should the AI be?</td><td>"You are a legal counsel specializing in vendor agreements…"</td></tr>
+      <tr><td><strong>CONTEXT</strong></td><td>What's the situation?</td><td>"We received a request from Counterparty X asking for…"</td></tr>
+      <tr><td><strong>TASK</strong></td><td>What exactly do you need?</td><td>"Draft a response providing only the required documents…"</td></tr>
+      <tr><td><strong>FORMAT</strong></td><td>How should it look?</td><td>"Respond in 3 paragraphs, professional tone, under 200 words."</td></tr>
+    </tbody>
+  </table>
+  <p>Most of us do this intuitively. Doing it consistently is what separates a great prompt from a mediocre one.</p>
+
+  <h2>3. A reusable template for high-stakes prompts</h2>
+  <p>For complex, repeatable work — diligence reviews, multi-step analyses, anything you'll run more than once — use this three-step structure:</p>
+  <h3>Step 1 — Scope</h3>
+  <blockquote>As an <code>(EXPERT_TYPE)</code> with a background in <code>(EXPERTISE_TYPES)</code>, and in consideration of the following context <code>(INDUSTRIES, COUNTRIES, BUSINESS_CONTEXT, PRIOR_ANALYSIS)</code>, analyze the following <code>(CONTENT_SOURCES)</code> for <code>(DESIRED_PATTERNS)</code>. While analyzing, alert the following <code>(HUMAN_ROLES)</code> via the following <code>(ALERT_METHODS AND ANALYSIS_CONTEXT)</code> when specific human expertise could meaningfully improve analysis. Once the analysis is complete, store it in the <code>(ANALYSIS_REPOSITORY)</code>.</blockquote>
+  <h3>Step 2 — Rigor</h3>
+  <blockquote>Document and retain your sources, citations, and reasoning for all actions associated with each step.</blockquote>
+  <h3>Step 3 — Internal process improvement</h3>
+  <blockquote>Recommend improvements to this workflow such as qualitative inclusion of more context and content source for more accurate and desired outcomes. Make recommendations on how analysis is conducted so that overall analyses trend up in quality over time. Include any specific recommendations for improving analysis efficiency, context richness, and the preservation of accurate data provenance and citation.</blockquote>
+  <p>Save the populated version back to the library when you find one that works well. The library compounds in value over time.</p>
+
+  <h2>4. Good vs. great prompts</h2>
+  <h3>Contract review</h3>
+  <p><span class="weak">Weak:</span> "Review this contract."<br><span class="strong">Strong:</span> "You are a legal counsel for a financial firm. Review this vendor agreement and list the top 3 deviations from our standard terms, flagging each as Low/Medium/High risk. One sentence per item."</p>
+  <h3>Email response</h3>
+  <p><span class="weak">Weak:</span> "Help me respond to this email."<br><span class="strong">Strong:</span> "You are drafting on behalf of a senior attorney. The counterparty requests a deadline extension. Decline professionally but offer an alternative date. Formal tone, under 100 words."</p>
+  <h3>Diligence / KYC request</h3>
+  <p><span class="weak">Weak:</span> "Help me respond to this KYC request."<br><span class="strong">Strong:</span> "You are a legal ops specialist. A fund administrator requests KYC docs. We provide only: [list]. Draft a professional reply with exactly these items, noting anything unavailable. Under 150 words."</p>
+  <p>The weak versions produce generic output that is often missing required info, includes info we shouldn't share, and needs heavy editing. The strong versions are ready-to-send in two minutes.</p>
+
+  <h2>5. Six techniques that separate power users</h2>
+  <p><strong>1. Be specific about constraints.</strong> Tell the AI what NOT to include. <em>"Do not share our EIN, bank details, or ownership structure unless explicitly required."</em></p>
+  <p><strong>2. Reference attached documents.</strong> Use <code>@</code> (or the equivalent attachment mechanism in your tool) and say <em>"Using the attached [document name], draft…"</em> This grounds the AI in your actual content.</p>
+  <p><strong>3. Iterate, don't restart.</strong> If the output is close but not right, say <em>"Revise paragraph 2 to be more formal"</em> or <em>"Shorten this to 3 bullet points."</em> Build on what's good. When you discover a better way to ask mid-conversation, tell the model to update its working instructions and restate them so you can save the new version back to the library.</p>
+  <p><strong>4. Specify your audience.</strong> <em>"This goes to a sophisticated institutional investor"</em> vs. <em>"This is for a fund admin's compliance team."</em> The AI calibrates tone and depth accordingly.</p>
+  <p><strong>5. Ask for a plan first.</strong> For complex tasks: <em>"Before drafting, list the key points you'll cover and flag any gaps in the information I've given you."</em> Approve the outline, then say <em>"Proceed."</em> Bonus: ask the model to suggest improvements to your prompt before it runs — it is unusually good at spotting underspecification in its own instructions.</p>
+  <p><strong>6. Request sources.</strong> Ask the AI to cite its sources so you can quickly identify where (if at all) it is hallucinating. Useful framings:</p>
+  <ul>
+    <li><em>"Cite the section number for every claim about the contract."</em></li>
+    <li><em>"For every number you give me, cite the tab and cell range from the workbook."</em></li>
+    <li><em>"If you are uncertain about a citation, say so explicitly rather than guessing."</em></li>
+    <li><em>"Don't invent citations — if you don't have a source, mark the claim <code>[UNCITED]</code>."</em></li>
+  </ul>
+
+  <h2>6. Match the model to the task</h2>
+  <ul>
+    <li><strong>Top-tier reasoning model</strong> (e.g., Claude Opus) — heavy analysis, contract review, complex reasoning. Use when accuracy beats speed.</li>
+    <li><strong>Workhorse model</strong> (e.g., Claude Sonnet) — most drafting, summarization, day-to-day work. The default for the library.</li>
+    <li><strong>Fast / cheap model</strong> (e.g., Claude Haiku) — high-volume classification, routing, quick checks where you'd run the same prompt many times.</li>
+  </ul>
+
+  <h2>7. Always avoid</h2>
+  <ul>
+    <li>Pasting confidential data into non-approved tools that have not been vetted by your org's security or legal team.</li>
+    <li>Sending AI output without human review.</li>
+    <li>Vague asks — use precise verbs: <em>draft, summarize, extract, compare.</em></li>
+    <li>Assuming context carries over — reset each session or create a Project.</li>
+  </ul>
+
+  <h2>8. Building the habit</h2>
+  <p>Better prompts → better outputs → more time for high-value work. Two small actions that make this real:</p>
+  <ul>
+    <li>Pick one technique from this guide and apply it to a real task this week.</li>
+    <li>When you find a prompt that works well, add it to your team's library so others benefit.</li>
+  </ul>
+  <blockquote class="callout-green">Ready to contribute? Head back to the <button class="nav-link" data-view="library" type="button" style="height:auto;padding:0;color:var(--green-700);font-weight:600">Library</button> and hit "Add a prompt."</blockquote>
+</main>
+
+<!-- ===================== MODAL ROOT ===================== -->
+<div id="modalRoot"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- ===================== SCRIPT ===================== -->
+<script>
+(function () {
+  // ── Config ──────────────────────────────────────────────────────
+  // Persistence: paste your Google Apps Script Web App URL below to sync new/edited
+  // prompts to a Google Sheet. Leave "" to run offline (prompts saved in this browser,
+  // and exportable as prompts.json entries via the footer button).
+  var CONFIG = {
+    SHEET_ENDPOINT: ""
+  };
+
+  // ── Seed data ───────────────────────────────────────────────────
+  var SEED_CATEGORIES = [
+    "Budget","Cross-functional","Document Review","Finance",
+    "Investments","Legal","MarComms","Project Management","Vendor Negotiation"
+  ];
+  var SEED_PROMPTS = [
+    {
+      id:"legal-nda-triage",
+      title:"NDA first-pass triage",
+      category:"Legal",
+      use_case:"Classify an incoming NDA as Green (standard), Yellow (counsel review), or Red (full legal review) before deeper work.",
+      audience:"Legal team, BD/sales who route NDAs",
+      model:"Claude Sonnet 4.6",
+      connectors:"Gmail, Google Drive",
+      inputs:"The NDA text (paste or attach)",
+      prompt:"You are a senior commercial lawyer triaging an incoming NDA. Classify it as GREEN (standard approval), YELLOW (counsel review), or RED (full legal review). Then list each clause that triggered your classification, quoting the language and explaining the concern in one sentence. Flag specifically: embedded non-solicits, non-competes, residual-knowledge clauses, IP assignment provisions, term/survival longer than 3 years, unilateral indemnities, and choice of law outside our standard jurisdictions. End with three short questions you would send back to the requester.\n\nNDA:\n{{nda_text}}",
+      example:"Classification: YELLOW. Triggered by §4 (3-year survival) and §7 (non-solicit of employees for 12 months). Suggested questions: (1) Can survival be reduced to 2 years? (2) Is the non-solicit limited to employees with whom we had direct contact?...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L3",
+      tags:["NDA","triage","contracts"],
+      is_example:true
+    },
+    {
+      id:"legal-contract-redline",
+      title:"Contract redline against playbook",
+      category:"Legal",
+      use_case:"Compare a vendor or customer contract against our negotiation playbook and produce a prioritized redline.",
+      audience:"Legal team",
+      model:"Claude Opus 4.6",
+      connectors:"Google Drive, Ironclad",
+      inputs:"Contract text + playbook reference",
+      prompt:"Act as a contracts attorney. Review the attached agreement against the playbook positions provided. For each material deviation, output: (1) section reference, (2) current language, (3) the playbook position, (4) suggested redline, (5) fallback position if the counterparty pushes back, and (6) business impact (low/medium/high) with a one-sentence rationale. Then write a short executive summary (max 5 bullets) for the deal owner. Cite the section number for every redline.\n\nContract:\n{{contract_text}}\n\nPlaybook:\n{{playbook_text}}",
+      example:"§7.2 Indemnity — current language is mutual but uncapped. Playbook position: cap at fees paid in trailing 12 months. Suggested redline: insert \"in no event shall either party's aggregate liability exceed...\" Fallback: 2x fees. Business impact: High.",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L3",
+      tags:["contracts","redline","playbook"],
+      is_example:true
+    },
+    {
+      id:"legal-compliance-check",
+      title:"Compliance check — proposed feature or initiative",
+      category:"Legal",
+      use_case:"Surface applicable regulations, required approvals, and risk areas before a feature or initiative ships.",
+      audience:"Legal team, product, ops",
+      model:"Claude Opus 4.6",
+      connectors:"",
+      inputs:"Description of the feature/initiative; jurisdictions of operation",
+      prompt:"You are a regulatory counsel. The team is proposing: {{proposal}}. The jurisdictions involved are: {{jurisdictions}}. Identify (1) every regulatory regime that plausibly applies (privacy, securities, consumer protection, export, AI-specific, sector-specific), (2) required internal approvals, (3) the top three risk areas ranked by severity x likelihood, and (4) a suggested escalation path. For each item, cite the specific statute, regulation, or guidance document by name and section. If you are uncertain about a citation, say so explicitly rather than guessing.",
+      example:"Applicable regimes: GDPR (Art. 6 lawful basis, Art. 35 DPIA likely required); EU AI Act (Art. 50 transparency obligations); US state privacy laws (CCPA §1798.140)...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Draft",
+      sensitivity:"L2",
+      tags:["compliance","regulatory","privacy"],
+      is_example:true
+    },
+    {
+      id:"finance-cell-snapshot",
+      title:"Cell budget snapshot",
+      category:"Budget",
+      use_case:"Quick where-do-we-stand summary for a Blue Funds cell (IPFS Core, IPFS Implementation, IPNI Core, libp2p Core).",
+      audience:"PL Infra leads, cell stewards",
+      model:"Claude Sonnet 4.6",
+      connectors:"Google Drive",
+      inputs:"Access to the cell's budget workbook in Drive",
+      prompt:"Pull the latest figures from the {{cell_name}} budget workbook. Produce a snapshot covering: opening balance for the current period, total commitments YTD, total disbursements YTD, current available balance, monthly burn rate (trailing 3 months), runway in months at current burn, and pipeline (grants under review by stage). Flag any line items that look anomalous compared to the prior period. Cite the tab and cell range for every number you report.",
+      example:"IPFS Core — Available balance: $X (Workbook → Summary!B12). Trailing 3-mo burn: $Y/mo (Disbursements!E45:E47). Runway: ~N months. Anomaly: legal fees in April were 4x the trailing average...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L2",
+      tags:["budget","cells","blue funds"],
+      notes:"Pairs with the blue-funds-grant-ops:blue-funds-budget skill. Always insist on cell-range citations.",
+      is_example:true
+    },
+    {
+      id:"finance-oif-invoice",
+      title:"OIF invoice → workbook row",
+      category:"Finance",
+      use_case:"Parse a monthly OIF invoice PDF into a paste-ready row for the OIF Fees Detail tab.",
+      audience:"Finance ops",
+      model:"Claude Sonnet 4.6",
+      connectors:"Google Drive",
+      inputs:"OIF invoice PDF",
+      prompt:"Extract from the attached OIF invoice: invoice number, invoice date, billing period, cell allocated to, line items (description + amount), subtotal, taxes, total. Output as a single tab-separated row matching the OIF Fees Detail tab schema. If any field is ambiguous, return the row but flag the field with [REVIEW] and explain why in a note below.",
+      example:"2026-04-15  INV-2026-042  Apr 2026  IPFS Core  Management fee  $12,500.00  $0  $12,500.00 / [REVIEW] Billing period overlaps with March — confirm with OIF.",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L3",
+      tags:["invoices","OIF","reconciliation"],
+      is_example:true
+    },
+    {
+      id:"capital-grant-triage",
+      title:"Grant application triage",
+      category:"Investments",
+      use_case:"First-pass review of an incoming grant application before it goes to advisory or memo drafting.",
+      audience:"Grant ops, cell stewards",
+      model:"Claude Opus 4.6",
+      connectors:"Google Drive",
+      inputs:"The application (PDF or text) + the cell's scope/criteria",
+      prompt:"You are reviewing a grant application for the {{cell_name}} cell. The cell scope is: {{cell_scope}}. Produce a triage report with: (1) Fit summary — is this in scope? (2) Completeness — list every required field that is missing or thin. (3) Risk flags — team, financial, technical, reputational. (4) Three to five clarifying questions to send back to the applicant before advisory review. (5) Recommendation: ready for advisory / needs revision / decline. Cite the application section for every observation.",
+      example:"Fit: In scope (libp2p protocol research). Completeness: Budget is present but does not break out personnel vs. infra costs (§5). Risk: Team has no prior libp2p contributions on record. Questions: (1) Can you share GitHub handles for the core team?...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L3",
+      tags:["grants","triage","intake"],
+      is_example:true
+    },
+    {
+      id:"capital-grant-memo",
+      title:"Grant review memo draft",
+      category:"Investments",
+      use_case:"Draft a structured review memo following the OIF memo template once an application has cleared triage.",
+      audience:"Cell stewards, advisors",
+      model:"Claude Opus 4.6",
+      connectors:"Google Drive, Notion",
+      inputs:"Application + triage notes + any advisory feedback",
+      prompt:"Draft a grant review memo for the {{cell_name}} cell following the OIF memo template. Use the application and triage notes provided. Sections: Summary, Applicant background, Scope of work, Budget & timeline, Strategic fit, Risks & mitigations, Advisory feedback, Recommendation. Keep the tone neutral and evidence-based. Every claim about the applicant or project should cite either the application section or the advisory note. Do not invent numbers or credentials.",
+      example:"Summary: The applicant proposes a 9-month effort to... (App §1). Strategic fit: Aligns with KR 2.1 of the libp2p Core roadmap (Advisory note, 2026-05-12). Risks: Single-developer dependency (App §3 — only one named contributor)...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L3",
+      tags:["grants","memos","review"],
+      is_example:true
+    },
+    {
+      id:"ops-update-in-a-box",
+      title:"Update-in-a-Box — Bi-weekly PL Infra Leads update",
+      category:"Project Management",
+      use_case:"Draft the bi-weekly PL Infra Leads update (OKR Progress + 2-Week Outlook) for any PL Infra team.",
+      audience:"Any PL Infra team lead",
+      model:"Claude Sonnet 4.6",
+      connectors:"Notion, Slack, Google Drive, Gmail",
+      inputs:"team-config.yaml (KRs, DRIs, outlook buckets) + source notes + the prior bi-weekly update",
+      prompt:"Draft this cycle's PL Infra Leads bi-weekly update for the {{team_name}} team.\n\nLoad team-config.yaml from my working folder for the team's active KRs, DRIs, and outlook buckets. If it is missing, ask the first-time setup questions and offer to save my answers.\n\nGather inputs from whichever of these I have pointed you at: pasted notes, attached files, Notion (notion-search / notion-fetch), Slack (slack_search), Drive, Gmail.\n\nRender the draft in chat as markdown using this structure:\n\n## Bi-Weekly PL Infra Leads Update — <Team> — <Date Range>\n\n### OKR Progress Updates (Last 2 Weeks)\n**🟢 KR1: <title>** — On Track\n- <bullet>\n\n**🟡 KR2: <title>** — Slightly Behind\n- <bullet>\n\n### 2-Week Outlook\n**<Bucket>**\n- <bullet>\n\n**Asks** (only if any)\n- <ask>\n\nFor each KR: status emoji first; 1–3 bullets on what changed; credit DRIs; quote concrete numbers; say \"No change since last update\" rather than dropping a KR. For any sensitive item use *[Placeholder: …]*. Do not fabricate timing or numbers.",
+      example:"## Bi-Weekly PL Infra Leads Update — PLCS — May 19–Jun 1, 2026\n\n**🟢 KR1: Close Q2 vendor diligence backlog** — On Track\n- 6 of 8 outstanding NDAs cleared through triage; remaining 2 in counsel review (Theresa).\n\n**🟡 KR2: Roll out AI prompt library to PL Infra** — Slightly Behind\n- Library deployed with 8 approved prompts; adoption tracking deferred *[Placeholder: dashboards pending]*.",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Approved",
+      sensitivity:"L2",
+      tags:["updates","OKRs","bi-weekly","leads-meeting","update-in-a-box"],
+      notes:"Public skill at https://github.com/protocol/update-in-a-box — installable as a .skill bundle in Cowork.",
+      is_example:false
+    },
+    {
+      id:"ops-meeting-briefing",
+      title:"Meeting briefing",
+      category:"Project Management",
+      use_case:"Pre-meeting brief covering attendees, prior context, open items, and suggested talking points.",
+      audience:"Anyone heading into a high-stakes meeting",
+      model:"Claude Sonnet 4.6",
+      connectors:"Notion, Google Drive",
+      inputs:"Meeting title, attendees, prior thread or email history",
+      prompt:"I have a meeting titled \"{{meeting_title}}\" with {{attendees}}. The relevant prior context is: {{context}}. Produce a briefing with: (1) one-paragraph background, (2) what each attendee likely wants out of this meeting, (3) open items from the last conversation, (4) three to five suggested talking points or questions I should raise, (5) any legal/compliance/financial implications I should be aware of. Flag anything you are uncertain about.",
+      example:"Background: Renewal discussion for the vendor MSA signed in 2024... Attendee goals: Vendor PM likely wants to expand scope; their counsel will want to keep liability cap. Open items: indemnity language flagged in last email...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Draft",
+      sensitivity:"L2",
+      tags:["meetings","prep"],
+      is_example:true
+    },
+    {
+      id:"ops-leadership-update",
+      title:"Internal comms — leadership update",
+      category:"MarComms",
+      use_case:"Convert a working set of notes or bullets into a polished leadership-ready update in PL Infra format.",
+      audience:"Anyone writing up the team",
+      model:"Claude Sonnet 4.6",
+      connectors:"",
+      inputs:"Bullet-point notes covering wins, risks, asks",
+      prompt:"Convert the following notes into a leadership update in our standard format: (1) Headline (one sentence), (2) Wins (max 3 bullets), (3) Risks (max 3 bullets, each with a proposed mitigation), (4) Asks (specific decisions or resources needed, each with an owner and a deadline). Tone: confident, evidence-based, no hedging. If a bullet lacks supporting evidence, flag it for me to fill in rather than inventing one.\n\nNotes:\n{{notes}}",
+      example:"Headline: PL Infra closed Q2 with all four cells on track and three new grants in pipeline. Wins: ... Risks: ... Asks: Approve $X additional headcount for legal ops by 6/15...",
+      author:"Theresa Therriault",
+      updated:"2026-06-01",
+      status:"Draft",
+      sensitivity:"L2",
+      tags:["comms","leadership","updates"],
+      is_example:true
+    }
+  ];
+
+  // ── Storage keys ────────────────────────────────────────────────
+  var K = {
+    votes:"pl-prompt-votes",
+    commentVotes:"pl-prompt-comment-votes",
+    comments:"pl-prompt-comments",
+    userPrompts:"pl-prompt-userprompts",
+    hiddenSeeds:"pl-prompt-hidden-seeds",
+    categories:"pl-prompt-categories",
+    user:"pl-prompt-user",
+    theme:"prompt-lib-theme"
+  };
+  function load(key, fallback){ try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e){ return fallback; } }
+  function save(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+
+  var userVotes    = load(K.votes, {});
+  var commentVotes = load(K.commentVotes, {});     // { commentId: true } — NOT counted in dashboard total
+  var comments     = load(K.comments, {});         // { promptId: [ {id,author,text,ts,parentId} ] }
+  var userPrompts  = load(K.userPrompts, []);      // [ prompt objects; may override a seed by shared id ]
+  var hiddenSeeds  = load(K.hiddenSeeds, []);      // [ seed ids the user has deleted ]
+  var extraCats    = load(K.categories, []);       // [ category strings added by users ]
+  var currentUser  = localStorage.getItem(K.user) || "Theresa Therriault";
+
+  // ── Derived data ────────────────────────────────────────────────
+  function isSeed(id){ return SEED_PROMPTS.some(function(p){ return p.id===id; }); }
+  function allPrompts(){
+    var overrides={};
+    userPrompts.forEach(function(p){ overrides[p.id]=p; });
+    var seeds=SEED_PROMPTS
+      .filter(function(p){ return hiddenSeeds.indexOf(p.id)===-1; })
+      .map(function(p){ return overrides[p.id] || p; });
+    var extras=userPrompts.filter(function(p){ return !isSeed(p.id); });
+    return seeds.concat(extras);
+  }
+  // You can edit/delete a prompt you authored (seed or user-added).
+  function canEdit(p){ return !!p.user_added || (p.author && p.author===currentUser); }
+  function allCategories(){
+    var set = {};
+    SEED_CATEGORIES.forEach(function(c){ set[c]=1; });
+    extraCats.forEach(function(c){ set[c]=1; });
+    allPrompts().forEach(function(p){ if(p.category) set[p.category]=1; });
+    return Object.keys(set).sort(function(a,b){ return a.localeCompare(b); });
+  }
+  function findPrompt(id){ return allPrompts().find(function(p){ return p.id===id; }); }
+
+  // ── Votes ───────────────────────────────────────────────────────
+  function getVotes(id){ return userVotes[id] ? 1 : 0; }
+  function hasVoted(id){ return !!userVotes[id]; }
+  function toggleVote(id){ userVotes[id] = !userVotes[id]; save(K.votes, userVotes); }
+  function totalVotesAll(){ return allPrompts().reduce(function(s,p){ return s + getVotes(p.id); }, 0); }
+  function topRanks(){
+    var ranked = allPrompts().filter(function(p){ return getVotes(p.id) > 0; })
+      .sort(function(a,b){ return getVotes(b.id) - getVotes(a.id); });
+    var map = {};
+    ranked.slice(0,3).forEach(function(p,i){ map[p.id] = i+1; });
+    return map;
+  }
+
+  // ── Popularity ranges ───────────────────────────────────────────
+  var POP_RANGES = [
+    { key:"0",    label:"No votes yet", test:function(v){ return v===0; } },
+    { key:"1-4",  label:"1–4 votes",    test:function(v){ return v>=1 && v<=4; } },
+    { key:"5-9",  label:"5–9 votes",    test:function(v){ return v>=5 && v<=9; } },
+    { key:"10+",  label:"10+ votes",    test:function(v){ return v>=10; } }
+  ];
+
+  // ── State ───────────────────────────────────────────────────────
+  var state = {
+    search:"", category:new Set(), sensitivity:new Set(),
+    status:new Set(), popularity:new Set(), sort:"votes", openCards:new Set()
+  };
+
+  function bucketOf(p){
+    if (p.is_example === true) return "Examples";
+    if (p.status === "Draft") return "Drafts";
+    if (p.status === "Approved") return "Approved";
+    if (p.status === "Deprecated") return "Deprecated";
+    return null;
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────
+  function esc(s){
+    return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function setText(id,v){ var el=document.getElementById(id); if(el) el.textContent=v; }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function uid(pref){ return (pref||"p")+"-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6); }
+  function relTime(ts){
+    var d = Date.now()-ts, m=Math.floor(d/60000);
+    if (m<1) return "just now";
+    if (m<60) return m+"m ago";
+    var h=Math.floor(m/60); if (h<24) return h+"h ago";
+    var day=Math.floor(h/24); if (day<7) return day+"d ago";
+    return new Date(ts).toLocaleDateString();
+  }
+  var SENS_LABELS = {L1:"L1 · Public",L2:"L2 · Internal",L3:"L3 · Confidential",L4:"L4 · Restricted"};
+
+  // ── Toast ───────────────────────────────────────────────────────
+  function toast(msg){
+    var t=document.getElementById("toast");
+    t.textContent=msg; t.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t=setTimeout(function(){ t.classList.remove("show"); },2200);
+  }
+
+  // ── Theme ───────────────────────────────────────────────────────
+  function initTheme(){
+    var saved=localStorage.getItem(K.theme);
+    if(saved) document.documentElement.setAttribute("data-theme",saved);
+    document.getElementById("themeToggle").addEventListener("click",function(){
+      var cur=document.documentElement.getAttribute("data-theme")||"light";
+      var next=cur==="light"?"dark":"light";
+      document.documentElement.setAttribute("data-theme",next);
+      localStorage.setItem(K.theme,next);
+    });
+  }
+
+  // ── Identity ────────────────────────────────────────────────────
+  function renderIdentity(){ setText("userName", currentUser); }
+  function initIdentity(){
+    renderIdentity();
+    document.getElementById("identityBtn").addEventListener("click",function(){
+      var name=window.prompt("Your display name (used on prompts you add and feedback you leave):", currentUser);
+      if(name && name.trim()){
+        currentUser=name.trim();
+        localStorage.setItem(K.user,currentUser);
+        renderIdentity();
+        toast("Name updated to "+currentUser);
+      }
+    });
+  }
+
+  // ── View switching ──────────────────────────────────────────────
+  function setView(view){
+    var isGuide = view==="guide";
+    document.getElementById("libraryView").hidden = isGuide;
+    document.getElementById("guideView").hidden = !isGuide;
+    document.getElementById("hero").hidden = isGuide;
+    document.querySelectorAll(".nav-link[data-view]").forEach(function(b){
+      b.classList.toggle("is-active", b.dataset.view===view);
+    });
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+  function bindViewSwitching(){
+    document.body.addEventListener("click",function(e){
+      var el=e.target.closest("[data-view]");
+      if(el){ e.preventDefault(); setView(el.dataset.view); }
+    });
+  }
+
+  // ── Stats ───────────────────────────────────────────────────────
+  function renderStats(){
+    var all=allPrompts();
+    setText("statTotal", all.length);
+    setText("statApproved", all.filter(function(p){return bucketOf(p)==="Approved";}).length);
+    setText("statDrafts", all.filter(function(p){return bucketOf(p)==="Drafts";}).length);
+    setText("statVotes", totalVotesAll());
+  }
+
+  // ── Filters ─────────────────────────────────────────────────────
+  function buildFilters(){
+    var all=allPrompts();
+    function renderList(containerId, field, items, countFn, labelFn){
+      var c=document.getElementById(containerId);
+      c.innerHTML="";
+      items.forEach(function(value){
+        var n=countFn(value);
+        var label=document.createElement("label");
+        label.className="filter-item";
+        var display=labelFn?labelFn(value):value;
+        var checked=state[field].has(value)?" checked":"";
+        label.innerHTML=
+          '<span class="filter-item-label">'+
+            '<input type="checkbox" data-field="'+field+'" data-value="'+esc(value)+'"'+checked+' />'+
+            '<span>'+esc(display)+'</span>'+
+          '</span>'+
+          '<span class="filter-item-count">'+n+'</span>';
+        c.appendChild(label);
+      });
+    }
+
+    renderList("filterCategory","category", allCategories(),
+      function(v){ return all.filter(function(p){return p.category===v;}).length; });
+    renderList("filterPopularity","popularity", POP_RANGES.map(function(r){return r.key;}),
+      function(key){ var r=POP_RANGES.find(function(x){return x.key===key;});
+        return all.filter(function(p){ return r.test(getVotes(p.id)); }).length; },
+      function(key){ return POP_RANGES.find(function(x){return x.key===key;}).label; });
+    renderList("filterSensitivity","sensitivity",["L1","L2","L3","L4"],
+      function(v){ return all.filter(function(p){return p.sensitivity===v;}).length; },
+      function(v){ return SENS_LABELS[v]; });
+    renderList("filterStatus","status",["Examples","Drafts","Approved"],
+      function(v){ return all.filter(function(p){return bucketOf(p)===v;}).length; });
+
+    document.querySelectorAll(".filter-item input").forEach(function(input){
+      input.addEventListener("change",function(e){
+        var f=e.target.dataset.field, v=e.target.dataset.value;
+        if(e.target.checked) state[f].add(v); else state[f].delete(v);
+        render();
+      });
+    });
+  }
+
+  // ── Controls ────────────────────────────────────────────────────
+  function bindControls(){
+    var search=document.getElementById("mainSearch");
+    search.addEventListener("input",function(e){ state.search=e.target.value.toLowerCase().trim(); render(); });
+    document.addEventListener("keydown",function(e){
+      if(document.querySelector(".modal-backdrop.show")) return;
+      if(e.key==="/" && document.activeElement!==search && !e.target.matches("input,textarea,select")){
+        e.preventDefault(); search.focus();
+      } else if(e.key==="Escape" && document.activeElement===search){
+        search.value=""; state.search=""; search.blur(); render();
+      }
+    });
+    document.getElementById("sortSelect").addEventListener("change",function(e){ state.sort=e.target.value; render(); });
+    document.getElementById("clearFilters").addEventListener("click",function(){
+      state.category.clear(); state.sensitivity.clear(); state.status.clear(); state.popularity.clear();
+      state.search="";
+      document.getElementById("mainSearch").value="";
+      render();
+    });
+    document.getElementById("addPromptBtn").addEventListener("click",function(){ openPromptModal(null); });
+    document.getElementById("exportJsonBtn").addEventListener("click",exportJson);
+    // Expand / collapse all (global)
+    document.getElementById("bulkBar").addEventListener("click",function(e){
+      var b=e.target.closest("[data-action]"); if(!b) return;
+      if(b.dataset.action==="expand-all"){ filtered().forEach(function(p){ state.openCards.add(p.id); }); }
+      else if(b.dataset.action==="collapse-all"){ state.openCards.clear(); }
+      render();
+    });
+    // Expand / collapse all (per category)
+    document.getElementById("promptSections").addEventListener("click",function(e){
+      var b=e.target.closest(".cat-toggle"); if(!b) return;
+      e.stopPropagation();
+      var ids=filtered().filter(function(p){return p.category===b.dataset.cat;}).map(function(p){return p.id;});
+      if(b.dataset.action==="expand-cat"){ ids.forEach(function(id){ state.openCards.add(id); }); }
+      else { ids.forEach(function(id){ state.openCards.delete(id); }); }
+      render();
+    });
+  }
+
+  // ── Filtering + sorting ─────────────────────────────────────────
+  function filtered(){
+    var out=allPrompts().slice();
+    if(state.category.size) out=out.filter(function(p){return state.category.has(p.category);});
+    if(state.sensitivity.size) out=out.filter(function(p){return state.sensitivity.has(p.sensitivity);});
+    if(state.status.size) out=out.filter(function(p){return state.status.has(bucketOf(p));});
+    if(state.popularity.size){
+      out=out.filter(function(p){
+        var v=getVotes(p.id);
+        return Array.from(state.popularity).some(function(key){
+          var r=POP_RANGES.find(function(x){return x.key===key;});
+          return r && r.test(v);
+        });
+      });
+    }
+    if(state.search){
+      var q=state.search;
+      out=out.filter(function(p){
+        return p.title.toLowerCase().includes(q) ||
+          (p.use_case||"").toLowerCase().includes(q) ||
+          (p.prompt||"").toLowerCase().includes(q) ||
+          (p.tags||[]).some(function(t){return t.toLowerCase().includes(q);}) ||
+          (p.author||"").toLowerCase().includes(q) ||
+          (p.connectors||"").toLowerCase().includes(q);
+      });
+    }
+    return out;
+  }
+  function sortList(list){
+    var sensRank={L1:1,L2:2,L3:3,L4:4};
+    var l=list.slice();
+    if(state.sort==="votes") l.sort(function(a,b){return getVotes(b.id)-getVotes(a.id);});
+    else if(state.sort==="alpha") l.sort(function(a,b){return a.title.localeCompare(b.title);});
+    else if(state.sort==="sensitivity") l.sort(function(a,b){return sensRank[a.sensitivity]-sensRank[b.sensitivity];});
+    else l.sort(function(a,b){return (b.updated||"").localeCompare(a.updated||"");});
+    return l;
+  }
+
+  // ── Chips ───────────────────────────────────────────────────────
+  function renderChips(){
+    var chips=document.getElementById("activeChips");
+    chips.innerHTML="";
+    var all=[];
+    state.category.forEach(function(v){all.push({field:"category",value:v,label:v});});
+    state.popularity.forEach(function(v){var r=POP_RANGES.find(function(x){return x.key===v;});all.push({field:"popularity",value:v,label:r?r.label:v});});
+    state.sensitivity.forEach(function(v){all.push({field:"sensitivity",value:v,label:v});});
+    state.status.forEach(function(v){all.push({field:"status",value:v,label:v});});
+    all.forEach(function(entry){
+      var chip=document.createElement("span");
+      chip.className="chip";
+      chip.innerHTML=esc(entry.label)+'<button aria-label="Remove filter"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';
+      chip.querySelector("button").addEventListener("click",function(){
+        state[entry.field].delete(entry.value); render();
+      });
+      chips.appendChild(chip);
+    });
+  }
+
+  // ── Comments rendering ──────────────────────────────────────────
+  function commentsFor(pid){ return (comments[pid]||[]).slice(); }
+  function commentCount(pid){ return (comments[pid]||[]).length; }
+  function addComment(pid, text, parentId){
+    if(!comments[pid]) comments[pid]=[];
+    comments[pid].push({ id:uid("c"), author:currentUser, text:text, ts:Date.now(), parentId:parentId||null });
+    save(K.comments, comments);
+  }
+  // Comment upvotes — tracked separately and intentionally NOT added to the dashboard vote total.
+  function getCommentVotes(id){ return commentVotes[id] ? 1 : 0; }
+  function hasVotedComment(id){ return !!commentVotes[id]; }
+  function toggleCommentVote(id){
+    if(commentVotes[id]) delete commentVotes[id]; else commentVotes[id]=true;
+    save(K.commentVotes, commentVotes);
+  }
+  function editComment(pid, id, text){
+    (comments[pid]||[]).forEach(function(x){ if(x.id===id){ x.text=text; x.edited=true; } });
+    save(K.comments, comments);
+  }
+  function descendantIds(pid, id){
+    var res=[id];
+    (comments[pid]||[]).filter(function(x){return x.parentId===id;}).forEach(function(ch){
+      res=res.concat(descendantIds(pid, ch.id));
+    });
+    return res;
+  }
+  function deleteComment(pid, id){
+    var remove=descendantIds(pid, id);
+    comments[pid]=(comments[pid]||[]).filter(function(x){ return remove.indexOf(x.id)===-1; });
+    remove.forEach(function(cid){ if(commentVotes[cid]) delete commentVotes[cid]; });
+    save(K.comments, comments); save(K.commentVotes, commentVotes);
+  }
+  function buildCommentNode(pid, c, list){
+    var wrap=document.createElement("div");
+    wrap.className="comment";
+    var cv=hasVotedComment(c.id), cvCount=getCommentVotes(c.id);
+    var mine=c.author===currentUser;
+    var ownerBtns=mine
+      ? '<button class="comment-edit-btn" type="button">Edit</button>'+
+        '<button class="comment-del-btn" type="button">Delete</button>'
+      : "";
+    wrap.innerHTML=
+      '<div class="comment-head"><span class="comment-author">'+esc(c.author)+'</span>'+
+        '<span class="comment-meta">'+relTime(c.ts)+(c.edited?' · edited':'')+'</span></div>'+
+      '<div class="comment-body">'+esc(c.text)+'</div>'+
+      '<div class="comment-actions">'+
+        '<button class="comment-vote'+(cv?' voted':'')+'" data-cv type="button" aria-pressed="'+cv+'" aria-label="'+(cv?'Remove upvote':'Upvote this comment')+'" title="Upvote this comment">'+
+          '<svg viewBox="0 0 24 24" width="12" height="12" fill="'+(cv?'currentColor':'none')+'" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'+
+          '<span class="cv-count">'+cvCount+'</span>'+
+        '</button>'+
+        '<button class="comment-reply-btn" type="button">Reply</button>'+
+        ownerBtns+
+      '</div>';
+    if(mine){
+      var editBtn=wrap.querySelector(".comment-edit-btn");
+      var delBtn=wrap.querySelector(".comment-del-btn");
+      editBtn.addEventListener("click",function(){
+        if(wrap.querySelector(".comment-edit-form")) return;
+        var bodyEl=wrap.querySelector(".comment-body");
+        var actions=wrap.querySelector(".comment-actions");
+        var form=document.createElement("div");
+        form.className="comment-form comment-edit-form";
+        form.innerHTML=
+          '<textarea aria-label="Edit comment"></textarea>'+
+          '<div class="comment-form-row">'+
+            '<span class="comment-as">Editing your comment</span>'+
+            '<span style="display:flex;gap:8px">'+
+              '<button class="action-btn" data-cancel type="button">Cancel</button>'+
+              '<button class="action-btn primary" data-save type="button">Save</button>'+
+            '</span>'+
+          '</div>';
+        var ta=form.querySelector("textarea"); ta.value=c.text;
+        bodyEl.style.display="none";
+        wrap.insertBefore(form, actions);
+        ta.focus();
+        form.querySelector("[data-cancel]").addEventListener("click",function(){ form.remove(); bodyEl.style.display=""; });
+        form.querySelector("[data-save]").addEventListener("click",function(){
+          var t=ta.value.trim(); if(!t){ ta.focus(); return; }
+          editComment(pid, c.id, t); toast("Comment updated"); refreshFeedback(pid);
+        });
+      });
+      delBtn.addEventListener("click",function(){
+        if(window.confirm("Delete your comment? Any replies to it will be removed too.")){
+          deleteComment(pid, c.id); toast("Comment deleted");
+          refreshFeedback(pid); updateFeedbackCount(pid);
+        }
+      });
+    }
+    var voteBtn=wrap.querySelector("[data-cv]");
+    voteBtn.addEventListener("click",function(){
+      toggleCommentVote(c.id);
+      var v=hasVotedComment(c.id);
+      voteBtn.classList.toggle("voted",v);
+      voteBtn.setAttribute("aria-pressed",v);
+      voteBtn.setAttribute("aria-label",v?"Remove upvote":"Upvote this comment");
+      voteBtn.querySelector("svg").setAttribute("fill",v?"currentColor":"none");
+      voteBtn.querySelector(".cv-count").textContent=getCommentVotes(c.id);
+    });
+    var replyBtn=wrap.querySelector(".comment-reply-btn");
+    var repliesWrap=document.createElement("div");
+    repliesWrap.className="comment-replies";
+    replyBtn.addEventListener("click",function(){
+      if(wrap.querySelector(".comment-form")) return;
+      var form=buildCommentForm(pid, c.id, function(){ /* re-render handled by caller */ });
+      wrap.insertBefore(form, repliesWrap);
+      form.querySelector("textarea").focus();
+    });
+    list.filter(function(x){return x.parentId===c.id;}).forEach(function(child){
+      repliesWrap.appendChild(buildCommentNode(pid, child, list));
+    });
+    wrap.appendChild(repliesWrap);
+    return wrap;
+  }
+  function buildCommentForm(pid, parentId, onDone){
+    var form=document.createElement("div");
+    form.className="comment-form";
+    form.innerHTML=
+      '<textarea placeholder="'+(parentId?"Write a reply…":"Leave a comment, question, or feedback…")+'" aria-label="Comment text"></textarea>'+
+      '<div class="comment-form-row">'+
+        '<span class="comment-as">Posting as <strong>'+esc(currentUser)+'</strong></span>'+
+        '<button class="action-btn primary" type="button">'+(parentId?"Reply":"Post")+'</button>'+
+      '</div>';
+    form.querySelector("button").addEventListener("click",function(){
+      var ta=form.querySelector("textarea");
+      var text=ta.value.trim();
+      if(!text){ ta.focus(); return; }
+      addComment(pid, text, parentId);
+      toast(parentId?"Reply posted":"Comment posted");
+      refreshFeedback(pid);
+      updateFeedbackCount(pid);
+    });
+    return form;
+  }
+  function renderFeedbackInto(pid, panel){
+    panel.innerHTML="";
+    var list=commentsFor(pid);
+    var top=list.filter(function(c){return !c.parentId;});
+    if(top.length===0){
+      var empty=document.createElement("p");
+      empty.className="comment-empty";
+      empty.textContent="No feedback yet — be the first to comment.";
+      panel.appendChild(empty);
+    } else {
+      top.forEach(function(c){ panel.appendChild(buildCommentNode(pid,c,list)); });
+    }
+    panel.appendChild(buildCommentForm(pid, null));
+  }
+  function refreshFeedback(pid){
+    var panel=document.querySelector('.feedback-panel[data-pid="'+CSS.escape(pid)+'"]');
+    if(panel) renderFeedbackInto(pid, panel);
+  }
+  function updateFeedbackCount(pid){
+    var btn=document.querySelector('.feedback-btn[data-pid="'+CSS.escape(pid)+'"] .fb-count');
+    if(btn) btn.textContent=commentCount(pid);
+  }
+
+  // ── Card rendering ──────────────────────────────────────────────
+  function renderCard(p, ranks){
+    var isExample = p.is_example===true;
+    var card=document.createElement("article");
+    card.className="prompt-card is-collapsible"+(isExample?" is-example":"");
+    if(state.openCards.has(p.id)) card.classList.add("is-open");
+    card.setAttribute("role","listitem");
+    card.dataset.id=p.id;
+
+    var statusBadge=bucketOf(p)||p.status;
+    var displayTitle=(isExample?"Example - ":"")+p.title;
+    var voted=hasVoted(p.id);
+    var voteCount=getVotes(p.id);
+    var rank=ranks[p.id];
+    var tagHtml=(p.tags||[]).map(function(t){return '<span class="tag">#'+esc(t)+'</span>';}).join("");
+    var connectorHtml=p.connectors?'<span><strong>Connectors:</strong> '+esc(p.connectors)+'</span>':"";
+    var rankHtml=(rank && rank<=3)
+      ? '<span class="rank-badge"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>#'+rank+'</span>'
+      : "";
+    var chevron='<span class="example-chevron" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></span>';
+    var exampleBadge=isExample?'<span class="badge badge-example">Example</span>':"";
+    var editHtml=canEdit(p)
+      ? '<button class="action-btn" data-action="edit"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Edit</button>'+
+        '<button class="action-btn danger" data-action="delete"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg> Delete</button>'
+      : "";
+    var notesHtml=p.notes?'<div class="prompt-notes"><strong>Notes:</strong> '+esc(p.notes)+'</div>':"";
+
+    card.innerHTML=
+      '<div class="prompt-head">'+
+        '<div class="prompt-title-wrap">'+chevron+
+          '<h2 class="prompt-title">'+esc(displayTitle)+'</h2>'+
+        '</div>'+
+        '<div class="prompt-badges">'+
+          rankHtml+exampleBadge+
+          '<span class="badge badge-category">'+esc(p.category)+'</span>'+
+          '<span class="badge badge-sensitivity" data-tier="'+esc(p.sensitivity)+'">'+(SENS_LABELS[p.sensitivity]||p.sensitivity)+'</span>'+
+          '<span class="badge badge-status" data-status="'+esc(statusBadge)+'">'+esc(statusBadge)+'</span>'+
+        '</div>'+
+      '</div>'+
+      '<div class="prompt-body">'+
+        '<div class="prompt-meta">'+
+          '<span><strong>Submitted by:</strong> '+esc(p.author)+'</span>'+
+          '<span><strong>For:</strong> '+esc(p.audience)+'</span>'+
+          '<span><strong>Model:</strong> '+esc(p.model)+'</span>'+
+          '<span><strong>Inputs:</strong> '+esc(p.inputs)+'</span>'+
+          connectorHtml+
+          '<span><strong>Updated:</strong> '+esc(p.updated)+'</span>'+
+        '</div>'+
+        '<p class="prompt-usecase">'+esc(p.use_case)+'</p>'+
+        '<div class="prompt-section">'+
+          '<div class="prompt-section-label">Prompt (click to expand)</div>'+
+          '<div class="prompt-text">'+esc(p.prompt)+'</div>'+
+        '</div>'+
+        (p.example?('<div class="prompt-section">'+
+          '<div class="prompt-section-label">Example output</div>'+
+          '<blockquote class="prompt-example"><em>'+esc(p.example)+'</em></blockquote>'+
+        '</div>'):"")+
+        (tagHtml?'<div class="prompt-tags">'+tagHtml+'</div>':"")+
+        notesHtml+
+        '<div class="prompt-actions">'+
+          '<div class="actions-left">'+
+            '<button class="vote-btn'+(voted?' voted':'')+'" data-action="vote" aria-pressed="'+voted+'" aria-label="'+(voted?'Remove upvote':'Upvote this prompt')+'">'+
+              '<svg viewBox="0 0 24 24" width="13" height="13" fill="'+(voted?'currentColor':'none')+'" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>'+
+              '<span class="vote-count">'+voteCount+'</span>'+
+            '</button>'+
+            '<button class="feedback-btn" data-action="feedback" data-pid="'+esc(p.id)+'">'+
+              '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'+
+              ' Feedback (<span class="fb-count">'+commentCount(p.id)+'</span>)'+
+            '</button>'+
+          '</div>'+
+          editHtml+
+          '<button class="action-btn primary" data-action="copy">'+
+            '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'+
+            ' Copy prompt'+
+          '</button>'+
+        '</div>'+
+        '<div class="feedback-panel" data-pid="'+esc(p.id)+'" hidden></div>'+
+      '</div>';
+
+    // Collapsible header (all cards)
+    card.querySelector(".prompt-head").addEventListener("click",function(){
+      var open=card.classList.toggle("is-open");
+      if(open) state.openCards.add(p.id); else state.openCards.delete(p.id);
+    });
+
+    // Expand/collapse prompt text
+    card.querySelector(".prompt-text").addEventListener("click",function(e){
+      e.stopPropagation();
+      e.currentTarget.classList.toggle("expanded");
+    });
+
+    // Copy
+    card.querySelector('[data-action="copy"]').addEventListener("click",function(e){
+      e.stopPropagation();
+      navigator.clipboard.writeText(p.prompt).then(function(){ toast("Prompt copied to clipboard"); });
+    });
+
+    // Vote
+    card.querySelector('[data-action="vote"]').addEventListener("click",function(e){
+      e.stopPropagation();
+      toggleVote(p.id);
+      var btn=e.currentTarget, nowVoted=hasVoted(p.id), newCount=getVotes(p.id);
+      btn.classList.toggle("voted",nowVoted);
+      btn.setAttribute("aria-pressed",nowVoted);
+      btn.setAttribute("aria-label",nowVoted?"Remove upvote":"Upvote this prompt");
+      btn.querySelector("svg").setAttribute("fill",nowVoted?"currentColor":"none");
+      btn.querySelector(".vote-count").textContent=newCount;
+      setText("statVotes",totalVotesAll());
+      toast(nowVoted?"Upvote added ▲":"Upvote removed");
+      if(state.sort==="votes" || state.popularity.size){
+        clearTimeout(renderCard._t);
+        renderCard._t=setTimeout(render,650);
+      }
+    });
+
+    // Feedback toggle
+    card.querySelector('[data-action="feedback"]').addEventListener("click",function(e){
+      e.stopPropagation();
+      var panel=card.querySelector('.feedback-panel');
+      if(panel.hidden){ renderFeedbackInto(p.id,panel); panel.hidden=false; }
+      else panel.hidden=true;
+    });
+
+    // Edit / delete (author only)
+    if(canEdit(p)){
+      card.querySelector('[data-action="edit"]').addEventListener("click",function(e){
+        e.stopPropagation(); openPromptModal(p.id);
+      });
+      card.querySelector('[data-action="delete"]').addEventListener("click",function(e){
+        e.stopPropagation();
+        if(window.confirm('Delete "'+p.title+'"? This removes it from the library.')){
+          deletePrompt(p.id);
+        }
+      });
+    }
+
+    return card;
+  }
+
+  // ── Render library (grouped by category) ────────────────────────
+  function render(){
+    buildFilters();
+    renderChips();
+    var mount=document.getElementById("promptSections");
+    var empty=document.getElementById("emptyState");
+    var items=filtered();
+    var ranks=topRanks();
+    mount.innerHTML="";
+
+    var bulk=document.getElementById("bulkBar");
+    if(items.length===0){
+      empty.hidden=false;
+      if(bulk) bulk.style.display="none";
+      setText("resultCount","0 prompts");
+      return;
+    }
+    empty.hidden=true;
+    if(bulk) bulk.style.display="flex";
+    setText("resultCount", items.length+" prompt"+(items.length===1?"":"s"));
+
+    // group by category
+    var groups={};
+    items.forEach(function(p){ (groups[p.category]=groups[p.category]||[]).push(p); });
+    var cats=Object.keys(groups).sort(function(a,b){return a.localeCompare(b);});
+
+    cats.forEach(function(cat){
+      var section=document.createElement("section");
+      section.className="cat-section";
+      var group=groups[cat];
+      section.innerHTML=
+        '<div class="cat-section-head">'+
+          '<h2 class="cat-section-title">'+esc(cat)+'</h2>'+
+          '<span class="cat-section-count">'+group.length+'</span>'+
+          '<span class="cat-actions">'+
+            '<button class="cat-toggle" data-action="expand-cat" data-cat="'+esc(cat)+'" type="button">Expand all</button>'+
+            '<button class="cat-toggle" data-action="collapse-cat" data-cat="'+esc(cat)+'" type="button">Collapse all</button>'+
+          '</span>'+
+        '</div>';
+      var listWrap=document.createElement("div");
+      listWrap.className="prompt-list";
+
+      var examples=sortList(group.filter(function(p){return p.is_example===true;}));
+      var rest=sortList(group.filter(function(p){return p.is_example!==true;}));
+      examples.forEach(function(p){ listWrap.appendChild(renderCard(p,ranks)); });
+      rest.forEach(function(p){ listWrap.appendChild(renderCard(p,ranks)); });
+
+      section.appendChild(listWrap);
+      mount.appendChild(section);
+    });
+  }
+
+  // ── Add / edit / delete prompt ──────────────────────────────────
+  var NEW_CAT="__new__";
+  function openPromptModal(editId){
+    var editing = editId ? findPrompt(editId) : null;
+    var cats=allCategories();
+    var catOptions=cats.map(function(c){
+      return '<option value="'+esc(c)+'"'+(editing&&editing.category===c?" selected":"")+'>'+esc(c)+'</option>';
+    }).join("");
+    var sensOptions=["L1","L2","L3","L4"].map(function(s){
+      return '<option value="'+s+'"'+(editing&&editing.sensitivity===s?" selected":"")+'>'+SENS_LABELS[s]+'</option>';
+    }).join("");
+    var statusOptions=["Draft","Approved","Deprecated"].map(function(s){
+      return '<option value="'+s+'"'+((editing?editing.status:"Draft")===s?" selected":"")+'>'+s+'</option>';
+    }).join("");
+
+    var backdrop=document.createElement("div");
+    backdrop.className="modal-backdrop";
+    backdrop.innerHTML=
+      '<div class="modal" role="dialog" aria-modal="true" aria-label="'+(editing?"Edit prompt":"Add a prompt")+'">'+
+        '<div class="modal-head">'+
+          '<h2 class="modal-title">'+(editing?"Edit prompt":"Add a prompt")+'</h2>'+
+          '<button class="icon-button" data-close aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>'+
+        '</div>'+
+        '<div class="modal-body">'+
+          field("title","Title","input","e.g., NDA first-pass triage",true,editing?editing.title:"")+
+          '<div class="field" data-key="category">'+
+            '<label>Category <span class="req">*</span></label>'+
+            '<select data-input="category"><option value="">Select a category…</option>'+catOptions+
+              '<option value="'+NEW_CAT+'">➕ Add a new category…</option></select>'+
+            '<input data-input="newCategory" placeholder="New category name" style="margin-top:8px;display:none" />'+
+          '</div>'+
+          '<div class="field-row">'+
+            fieldRaw("intended_audience","Intended audience","input","Who this is for",true,editing?editing.audience:"")+
+            fieldRaw("recommended_model","Recommended model","input","e.g., Claude Opus for analysis",true,editing?editing.model:"")+
+          '</div>'+
+          field("use_case","Use case","textarea","One or two sentences on when to use it.",true,editing?editing.use_case:"")+
+          field("inputs_required","Inputs required","input","What the user must supply before running.",true,editing?editing.inputs:"")+
+          field("connectors","Connectors","input","e.g., Gmail, Google Drive, Notion (optional)",false,editing?editing.connectors:"")+
+          fieldMono("prompt_text","Prompt text","Verbatim prompt. Use {{double_braces}} for variable inputs.",true,editing?editing.prompt:"")+
+          field("example_output","Example output","textarea","3–5 line abbreviated sample showing what good output looks like.",true,editing?editing.example:"")+
+          '<div class="field-row">'+
+            '<div class="field" data-key="sensitivity"><label>Sensitivity <span class="req">*</span></label><select data-input="sensitivity"><option value="">Select…</option>'+sensOptions+'</select><div class="field-hint">Set by the inputs, not the outputs. When unsure, go one tier higher.</div></div>'+
+            '<div class="field" data-key="status"><label>Status <span class="req">*</span></label><select data-input="status">'+statusOptions+'</select><div class="field-hint">New prompts start as Draft until a second person tests them.</div></div>'+
+          '</div>'+
+          '<div class="field-row">'+
+            fieldRaw("author","Submitted by","input","Your name / team",true,editing?editing.author:currentUser)+
+            fieldRaw("tags","Tags","input","comma, separated, tags",false,editing?(editing.tags||[]).join(", "):"")+
+          '</div>'+
+          field("notes","Notes","textarea","Optional caveats, gotchas, or related prompts.",false,editing?(editing.notes||""):"")+
+        '</div>'+
+        '<div class="modal-foot">'+
+          '<button class="link-button" data-close type="button">Cancel</button>'+
+          '<button class="link-button primary" data-save type="button">'+(editing?"Save changes":"Add prompt")+'</button>'+
+        '</div>'+
+      '</div>';
+
+    document.getElementById("modalRoot").appendChild(backdrop);
+    requestAnimationFrame(function(){ backdrop.classList.add("show"); });
+
+    function close(){ backdrop.classList.remove("show"); setTimeout(function(){ backdrop.remove(); },160); }
+    backdrop.addEventListener("click",function(e){ if(e.target===backdrop) close(); });
+    backdrop.querySelectorAll("[data-close]").forEach(function(b){ b.addEventListener("click",close); });
+    document.addEventListener("keydown",function onEsc(e){ if(e.key==="Escape"){ close(); document.removeEventListener("keydown",onEsc); } });
+
+    // New-category toggle
+    var catSel=backdrop.querySelector('[data-input="category"]');
+    var newCatInput=backdrop.querySelector('[data-input="newCategory"]');
+    catSel.addEventListener("change",function(){
+      if(catSel.value===NEW_CAT){ newCatInput.style.display="block"; newCatInput.focus(); }
+      else newCatInput.style.display="none";
+    });
+
+    function val(key){ var el=backdrop.querySelector('[data-input="'+key+'"]'); return el?el.value.trim():""; }
+    function markErr(key,on){ var f=backdrop.querySelector('.field[data-key="'+key+'"]'); if(f) f.classList.toggle("err",!!on); }
+
+    backdrop.querySelector("[data-save]").addEventListener("click",function(){
+      var category=val("category");
+      if(category===NEW_CAT) category=val("newCategory");
+      var record={
+        title:val("title"),
+        category:category,
+        audience:val("intended_audience"),
+        model:val("recommended_model"),
+        use_case:val("use_case"),
+        inputs:val("inputs_required"),
+        connectors:val("connectors"),
+        prompt:backdrop.querySelector('[data-input="prompt_text"]').value.trim(),
+        example:val("example_output"),
+        sensitivity:val("sensitivity"),
+        status:val("status")||"Draft",
+        author:val("author")||currentUser,
+        tags:val("tags")?val("tags").split(",").map(function(t){return t.trim();}).filter(Boolean):[],
+        notes:val("notes")
+      };
+
+      // Validate required
+      var required={title:"title",category:"category",intended_audience:"audience",
+        recommended_model:"model",use_case:"use_case",inputs_required:"inputs",
+        prompt_text:"prompt",example_output:"example",sensitivity:"sensitivity",author:"author"};
+      var missing=[];
+      Object.keys(required).forEach(function(fk){
+        var recKey=required[fk];
+        var ok = fk==="prompt_text" ? !!record.prompt : !!record[recKey==="audience"?"audience":recKey];
+        if(fk==="title") ok=!!record.title;
+        if(fk==="category") ok=!!record.category;
+        markErr(fk,!ok);
+        if(!ok) missing.push(fk);
+      });
+      if(missing.length){ toast("Please complete all required fields."); return; }
+
+      if(editing){
+        record.id=editing.id;
+        record.is_example=editing.is_example||false;
+        record.user_added=true;
+        record.updated=todayISO();
+        // Upsert — for a seed prompt this stores an override under the shared id
+        var idx=userPrompts.findIndex(function(x){return x.id===editing.id;});
+        if(idx>=0) userPrompts[idx]=record; else userPrompts.push(record);
+      } else {
+        record.id=uid("user");
+        record.is_example=false;
+        record.user_added=true;
+        record.updated=todayISO();
+        userPrompts.push(record);
+      }
+      save(K.userPrompts,userPrompts);
+
+      // Persist new category
+      if(category && allCategories().indexOf(category)===-1){}
+      if(category && SEED_CATEGORIES.indexOf(category)===-1 && extraCats.indexOf(category)===-1){
+        extraCats.push(category); save(K.categories,extraCats);
+      }
+
+      persist(record, editing?"update":"create");
+      renderStats();
+      render();
+      close();
+      toast(editing?"Prompt updated":"Prompt added — saved to the library");
+    });
+
+    backdrop.querySelector('[data-input="title"]').focus();
+  }
+
+  function deletePrompt(id){
+    var p=findPrompt(id);
+    userPrompts=userPrompts.filter(function(x){return x.id!==id;});
+    save(K.userPrompts,userPrompts);
+    // Deleting a built-in (seed) prompt hides it via an override list
+    if(isSeed(id) && hiddenSeeds.indexOf(id)===-1){
+      hiddenSeeds.push(id); save(K.hiddenSeeds,hiddenSeeds);
+    }
+    if(p) persist(p,"delete");
+    renderStats();
+    render();
+    toast("Prompt deleted");
+  }
+
+  // ── Persistence (Google Sheet write-back + fallback) ────────────
+  function toSchema(p){
+    return {
+      title:p.title, category:p.category, use_case:p.use_case,
+      intended_audience:p.audience, recommended_model:p.model,
+      inputs_required:p.inputs, connectors:p.connectors||"",
+      prompt_text:p.prompt, example_output:p.example,
+      author:p.author, last_updated:p.updated,
+      status:p.status, sensitivity:p.sensitivity,
+      tags:p.tags||[], notes:p.notes||""
+    };
+  }
+  function persist(prompt, action){
+    if(!CONFIG.SHEET_ENDPOINT){
+      // Offline: data already in localStorage. Nudge toward source-doc export.
+      return;
+    }
+    try{
+      fetch(CONFIG.SHEET_ENDPOINT,{
+        method:"POST",
+        mode:"no-cors",
+        headers:{"Content-Type":"text/plain;charset=utf-8"},
+        body:JSON.stringify({ action:action, id:prompt.id, prompt:toSchema(prompt), submittedBy:currentUser })
+      }).then(function(){ toast("Synced to Google Sheet"); })
+        .catch(function(){ toast("Saved locally — Sheet sync failed"); });
+    }catch(e){}
+  }
+  function exportJson(){
+    var payload=userPrompts.map(toSchema);
+    var text=JSON.stringify(payload,null,2);
+    navigator.clipboard.writeText(text).then(function(){
+      toast(payload.length?("Copied "+payload.length+" prompt(s) as prompts.json entries"):"No user-added prompts to export yet");
+    }).catch(function(){ window.prompt("Copy your prompts.json entries:",text); });
+  }
+
+  // ── Form field builders ─────────────────────────────────────────
+  function field(key,label,type,ph,req,value){ return fieldRaw(key,label,type,ph,req,value); }
+  function fieldRaw(key,label,type,ph,req,value){
+    var reqTag=req?' <span class="req">*</span>':'';
+    var control = type==="textarea"
+      ? '<textarea data-input="'+key+'" placeholder="'+esc(ph)+'">'+esc(value||"")+'</textarea>'
+      : '<input data-input="'+key+'" placeholder="'+esc(ph)+'" value="'+esc(value||"")+'" />';
+    return '<div class="field" data-key="'+key+'"><label>'+esc(label)+reqTag+'</label>'+control+'</div>';
+  }
+  function fieldMono(key,label,ph,req,value){
+    var reqTag=req?' <span class="req">*</span>':'';
+    return '<div class="field" data-key="'+key+'"><label>'+esc(label)+reqTag+'</label>'+
+      '<textarea class="mono" data-input="'+key+'" style="min-height:150px" placeholder="'+esc(ph)+'">'+esc(value||"")+'</textarea>'+
+      '<div class="field-hint">Use <code>{{double_braces}}</code> for variable inputs.</div></div>';
+  }
+
+  // ── Init ────────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded",function(){
+    initTheme();
+    initIdentity();
+    bindViewSwitching();
+    bindControls();
+    renderStats();
+    render();
+  });
+})();
+</script>
+</body>
+</html>

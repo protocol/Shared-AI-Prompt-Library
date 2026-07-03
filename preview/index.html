@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shared AI Prompt Library — PL Infra</title>
+  <meta name="description" content="PL Infra's shared AI prompt library — browse, filter, copy, and upvote approved prompts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230090ff'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css?v=12" />
+</head>
+<body>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#" data-view="library">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="28" height="28">
+          <rect width="32" height="32" rx="8" fill="currentColor"/>
+          <path d="M9 10h14M9 16h14M9 22h9" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">Shared AI Prompt Library</span>
+        <span class="brand-sub">PL Infra · approved prompts, shared with the team</span>
+      </span>
+    </a>
+
+    <nav class="topbar-nav" aria-label="Primary">
+      <button class="nav-link is-active" data-view="library" type="button">Library</button>
+      <button class="nav-link" data-view="guide" type="button">Prompting Guide</button>
+    </nav>
+
+    <div class="topbar-actions">
+      <button class="link-button primary" id="addPromptBtn" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add a prompt
+      </button>
+      <button class="icon-button" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+
+    <!-- Tablet/mobile: collapses the nav + actions + filters + theme into one menu -->
+    <button class="nav-toggle" id="navMenuBtn" type="button" aria-label="Menu" aria-haspopup="true" aria-expanded="false" aria-controls="navMenu">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="nav-menu" id="navMenu" role="menu" hidden>
+      <button class="nav-menu-item" data-view="library" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>
+        Library
+      </button>
+      <button class="nav-menu-item" data-view="guide" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Prompting Guide
+      </button>
+      <button class="nav-menu-item nav-menu-add" id="menuAddPrompt" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+        Add a prompt
+      </button>
+      <button class="nav-menu-item" id="menuFeedback" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Send feedback
+      </button>
+      <div class="nav-menu-sep" role="separator"></div>
+      <button class="nav-menu-item nav-menu-filters-toggle" id="menuFilters" type="button" aria-expanded="false" aria-controls="navMenuFilters">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+        <span id="menuFiltersLabel">Filters</span>
+        <svg class="nav-menu-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="nav-menu-filters" id="navMenuFilters" hidden></div>
+      <div class="nav-menu-sep" role="separator"></div>
+      <button class="nav-menu-item" id="menuIdentity" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Your name
+      </button>
+      <button class="nav-menu-item" id="menuTheme" role="menuitem" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <span id="menuThemeLabel">Dark mode</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div>
+      <h1>Shared AI Prompt Library</h1>
+      <p class="tagline">A growing collection of approved prompts for legal, finance, capital, ops, and beyond. Add, filter, copy, and upvote the prompts your team finds most useful.</p>
+      <div class="hero-stats hero-stats--single">
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statTotal">&mdash;</span>
+          <span class="hero-stat-label">Total prompts</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statApproved">&mdash;</span>
+          <span class="hero-stat-label">Approved</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statDrafts">&mdash;</span>
+          <span class="hero-stat-label">Drafts</span>
+        </div>
+        <div class="hero-stat">
+          <span class="hero-stat-num" id="statVotes">&mdash;</span>
+          <span class="hero-stat-label">Total votes</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div class="hero-art-title">The Golden Prompting Formula</div>
+      <div class="hero-formula">
+        <span class="formula-chip">ROLE</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">CONTEXT</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">TASK</span>
+        <span class="formula-op">+</span>
+        <span class="formula-chip">FORMAT</span>
+        <span class="formula-eq">=</span>
+        <span class="formula-out">Great Output</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== LIBRARY VIEW ===================== -->
+<main class="layout" id="libraryView">
+  <!-- Sidebar filters -->
+  <aside class="sidebar" aria-label="Filters">
+    <button class="ghost-button identity-btn" id="identityBtn" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Your name
+    </button>
+    <button class="ghost-button feedback-btn-side" id="feedbackBtn" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Send feedback
+    </button>
+    <div class="filter-card">
+      <h3>Category</h3>
+      <div class="filter-list" id="filterCategory"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Popularity</h3>
+      <div class="filter-list" id="filterPopularity"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Sensitivity</h3>
+      <div class="filter-list" id="filterSensitivity"></div>
+    </div>
+    <div class="filter-card">
+      <h3>Status</h3>
+      <div class="filter-list" id="filterStatus"></div>
+    </div>
+    <button class="ghost-button" id="clearFilters" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+      Clear all filters
+    </button>
+  </aside>
+
+  <!-- Content -->
+  <section class="content">
+    <div class="content-header">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="mainSearch" class="search-input" placeholder="Search prompts by name, text, tag, or author…" aria-label="Search prompts" />
+        <kbd class="search-kbd" aria-hidden="true">/</kbd>
+      </div>
+      <div class="results-row">
+        <div id="activeChips" class="active-chips" aria-live="polite"></div>
+        <div class="result-meta">
+          <span id="resultCount">0 prompts</span>
+          <span class="dot" aria-hidden="true">·</span>
+          <label class="select-wrap">
+            Sort:
+            <select id="sortSelect" aria-label="Sort prompts">
+              <option value="votes">Most voted</option>
+              <option value="recent">Recently updated</option>
+              <option value="alpha">Alphabetical</option>
+              <option value="sensitivity">Sensitivity (low → high)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="leaderboardNote" class="leaderboard-note">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Upvote prompts you find useful and leave feedback &mdash; it helps the team discover what's working. Examples sit at the top of each category, collapsed.
+    </div>
+
+    <div class="bulk-bar" id="bulkBar">
+      <button class="bulk-btn" data-action="expand-all" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 13 5 5 5-5M7 6l5 5 5-5"/></svg>
+        Expand all
+      </button>
+      <button class="bulk-btn" data-action="collapse-all" type="button">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 5-5 5 5M7 18l5-5 5 5"/></svg>
+        Collapse all
+      </button>
+    </div>
+
+    <div id="promptSections"></div>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <h3>No prompts match those filters</h3>
+      <p>Try clearing a filter or broadening your search.</p>
+      <button class="action-btn" type="button" onclick="document.getElementById('clearFilters').click()">Clear all filters</button>
+    </div>
+
+    <footer class="page-footer">
+      <p><strong>Living library.</strong> To contribute, use the Add a prompt button up top. New and edited prompts sync to the shared Google Sheet (or export as a <code>prompts.json</code> entry when offline). For prompting techniques, open the <button class="nav-link" data-view="guide" type="button" style="height:auto;padding:0;color:var(--brand-600)">Prompting Guide</button>.</p>
+      <div><button class="ghost-button" id="exportJsonBtn" type="button">Export all prompts as prompts.json</button></div>
+    </footer>
+  </section>
+</main>
+
+<!-- ===================== GUIDE VIEW ===================== -->
+<main class="guide" id="guideView" hidden>
+  <h1>Prompting Guide</h1>
+  <p class="guide-intro">An AI tool is only as good as the instruction you give it. A vague prompt gets a generic answer. A precise, context-rich prompt gets a polished, ready-to-use response. The difference is your prompt.</p>
+
+  <h2>1. Where AI is already winning</h2>
+  <p>Most teams are already using AI for one or more of these. Naming them out loud helps you spot where else AI can plug in:</p>
+  <ul>
+    <li><strong>Contracts &amp; agreements</strong> — draft, review, redline, summarize; extract key terms and flag unusual clauses.</li>
+    <li><strong>Response drafting</strong> — professional emails, letters, replies; routine through sensitive.</li>
+    <li><strong>Diligence &amp; KYC</strong> — determine document requirements, draft response emails, manage certification letters.</li>
+    <li><strong>Special projects</strong> — research, summarize, draft memos, produce first-pass deliverables for complex work.</li>
+    <li><strong>Process &amp; admin</strong> — checklists, templates, trackers, process documentation for repeatable workflows.</li>
+    <li><strong>Proofreading &amp; polish</strong> — refine tone, check consistency, restructure arguments, catch errors before send.</li>
+  </ul>
+
+  <h2>2. The Golden Prompting Formula</h2>
+  <p><strong>ROLE + CONTEXT + TASK + FORMAT = Great Output</strong></p>
+  <table>
+    <thead><tr><th>Component</th><th>Question it answers</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ROLE</strong></td><td>Who should the AI be?</td><td>"You are a legal counsel specializing in vendor agreements…"</td></tr>
+      <tr><td><strong>CONTEXT</strong></td><td>What's the situation?</td><td>"We received a request from Counterparty X asking for…"</td></tr>
+      <tr><td><strong>TASK</strong></td><td>What exactly do you need?</td><td>"Draft a response providing only the required documents…"</td></tr>
+      <tr><td><strong>FORMAT</strong></td><td>How should it look?</td><td>"Respond in 3 paragraphs, professional tone, under 200 words."</td></tr>
+    </tbody>
+  </table>
+  <p>Most of us do this intuitively. Doing it consistently is what separates a great prompt from a mediocre one.</p>
+
+  <h2>3. A reusable template for high-stakes prompts</h2>
+  <p>For complex, repeatable work — diligence reviews, multi-step analyses, anything you'll run more than once — use this three-step structure:</p>
+  <h3>Step 1 — Scope</h3>
+  <blockquote>As an <code>(EXPERT_TYPE)</code> with a background in <code>(EXPERTISE_TYPES)</code>, and in consideration of the following context <code>(INDUSTRIES, COUNTRIES, BUSINESS_CONTEXT, PRIOR_ANALYSIS)</code>, analyze the following <code>(CONTENT_SOURCES)</code> for <code>(DESIRED_PATTERNS)</code>. While analyzing, alert the following <code>(HUMAN_ROLES)</code> via the following <code>(ALERT_METHODS AND ANALYSIS_CONTEXT)</code> when specific human expertise could meaningfully improve analysis. Once the analysis is complete, store it in the <code>(ANALYSIS_REPOSITORY)</code>.</blockquote>
+  <h3>Step 2 — Rigor</h3>
+  <blockquote>Document and retain your sources, citations, and reasoning for all actions associated with each step.</blockquote>
+  <h3>Step 3 — Internal process improvement</h3>
+  <blockquote>Recommend improvements to this workflow such as qualitative inclusion of more context and content source for more accurate and desired outcomes. Make recommendations on how analysis is conducted so that overall analyses trend up in quality over time. Include any specific recommendations for improving analysis efficiency, context richness, and the preservation of accurate data provenance and citation.</blockquote>
+  <p>Save the populated version back to the library when you find one that works well. The library compounds in value over time.</p>
+
+  <h2>4. Good vs. great prompts</h2>
+  <h3>Contract review</h3>
+  <p><span class="weak">Weak:</span> "Review this contract."<br><span class="strong">Strong:</span> "You are a legal counsel for a financial firm. Review this vendor agreement and list the top 3 deviations from our standard terms, flagging each as Low/Medium/High risk. One sentence per item."</p>
+  <h3>Email response</h3>
+  <p><span class="weak">Weak:</span> "Help me respond to this email."<br><span class="strong">Strong:</span> "You are drafting on behalf of a senior attorney. The counterparty requests a deadline extension. Decline professionally but offer an alternative date. Formal tone, under 100 words."</p>
+  <h3>Diligence / KYC request</h3>
+  <p><span class="weak">Weak:</span> "Help me respond to this KYC request."<br><span class="strong">Strong:</span> "You are a legal ops specialist. A fund administrator requests KYC docs. We provide only: [list]. Draft a professional reply with exactly these items, noting anything unavailable. Under 150 words."</p>
+  <p>The weak versions produce generic output that is often missing required info, includes info we shouldn't share, and needs heavy editing. The strong versions are ready-to-send in two minutes.</p>
+
+  <h2>5. Six techniques that separate power users</h2>
+  <p><strong>1. Be specific about constraints.</strong> Tell the AI what NOT to include. <em>"Do not share our EIN, bank details, or ownership structure unless explicitly required."</em></p>
+  <p><strong>2. Reference attached documents.</strong> Use <code>@</code> (or the equivalent attachment mechanism in your tool) and say <em>"Using the attached [document name], draft…"</em> This grounds the AI in your actual content.</p>
+  <p><strong>3. Iterate, don't restart.</strong> If the output is close but not right, say <em>"Revise paragraph 2 to be more formal"</em> or <em>"Shorten this to 3 bullet points."</em> Build on what's good. When you discover a better way to ask mid-conversation, tell the model to update its working instructions and restate them so you can save the new version back to the library.</p>
+  <p><strong>4. Specify your audience.</strong> <em>"This goes to a sophisticated institutional investor"</em> vs. <em>"This is for a fund admin's compliance team."</em> The AI calibrates tone and depth accordingly.</p>
+  <p><strong>5. Ask for a plan first.</strong> For complex tasks: <em>"Before drafting, list the key points you'll cover and flag any gaps in the information I've given you."</em> Approve the outline, then say <em>"Proceed."</em> Bonus: ask the model to suggest improvements to your prompt before it runs — it is unusually good at spotting underspecification in its own instructions.</p>
+  <p><strong>6. Request sources.</strong> Ask the AI to cite its sources so you can quickly identify where (if at all) it is hallucinating. Useful framings:</p>
+  <ul>
+    <li><em>"Cite the section number for every claim about the contract."</em></li>
+    <li><em>"For every number you give me, cite the tab and cell range from the workbook."</em></li>
+    <li><em>"If you are uncertain about a citation, say so explicitly rather than guessing."</em></li>
+    <li><em>"Don't invent citations — if you don't have a source, mark the claim <code>[UNCITED]</code>."</em></li>
+  </ul>
+
+  <h2>6. Match the model to the task</h2>
+  <ul>
+    <li><strong>Top-tier reasoning model</strong> (e.g., Claude Opus) — heavy analysis, contract review, complex reasoning. Use when accuracy beats speed.</li>
+    <li><strong>Workhorse model</strong> (e.g., Claude Sonnet) — most drafting, summarization, day-to-day work. The default for the library.</li>
+    <li><strong>Fast / cheap model</strong> (e.g., Claude Haiku) — high-volume classification, routing, quick checks where you'd run the same prompt many times.</li>
+  </ul>
+
+  <h2>7. Always avoid</h2>
+  <ul>
+    <li>Pasting confidential data into non-approved tools that have not been vetted by your org's security or legal team.</li>
+    <li>Sending AI output without human review.</li>
+    <li>Vague asks — use precise verbs: <em>draft, summarize, extract, compare.</em></li>
+    <li>Assuming context carries over — reset each session or create a Project.</li>
+  </ul>
+
+  <h2>8. Building the habit</h2>
+  <p>Better prompts → better outputs → more time for high-value work. Two small actions that make this real:</p>
+  <ul>
+    <li>Pick one technique from this guide and apply it to a real task this week.</li>
+    <li>When you find a prompt that works well, add it to your team's library so others benefit.</li>
+  </ul>
+  <blockquote class="callout-green">Ready to contribute? Head back to the <button class="nav-link" data-view="library" type="button" style="height:auto;padding:0;color:var(--green-700);font-weight:600">Library</button> and hit "Add a prompt."</blockquote>
+</main>
+
+<!-- ===================== MODAL ROOT ===================== -->
+<div id="modalRoot"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js?v=12"></script>
+<script src="prompts.js?v=12"></script>
+<script src="app.js?v=12"></script>
+</body>
+</html>

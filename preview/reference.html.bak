@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prompting Guide — PL Infra Prompt Library</title>
+  <meta name="description" content="Purpose & scope, contribution workflow, sensitivity tiers, and prompting best practices for the PL Infra Prompt Library." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230090ff'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h9' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="./">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="28" height="28">
+            <rect width="32" height="32" rx="8" fill="currentColor"/>
+            <path d="M9 10h14M9 16h14M9 22h9" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-text">
+          <span class="brand-name">PL Infra Prompt Library</span>
+          <span class="brand-sub">Prompting Guide</span>
+        </span>
+      </a>
+      <nav class="topbar-nav" aria-label="Primary">
+        <a class="nav-link" href="./">Library</a>
+        <a class="nav-link is-active" href="./reference.html">Prompting Guide</a>
+      </nav>
+      <div class="topbar-actions">
+        <a class="link-button primary" href="./add-prompt.html">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add a prompt</span>
+        </a>
+        <button class="icon-button" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="reference-wrap">
+    <h1>Prompting Guide</h1>
+    <p class="lead">Everything you need to use, contribute to, and write well for the PL Infra Prompt Library.</p>
+
+    <nav class="toc" aria-label="On this page">
+      <div class="toc-title">On this page</div>
+      <ul>
+        <li><a href="#purpose-scope">1. Purpose &amp; scope</a></li>
+        <li><a href="#how-to-contribute">2. How to contribute</a></li>
+        <li><a href="#sensitivity-classifications">3. Sensitivity classifications</a></li>
+        <li><a href="#golden-formula">4. The Golden Prompting Formula</a></li>
+        <li><a href="#reusable-template">5. A reusable template for high-stakes prompts</a></li>
+        <li><a href="#six-techniques">6. Six techniques that separate power users</a></li>
+        <li><a href="#tool-reference">7. Quick reference — which tool for what</a></li>
+        <li><a href="#always-avoid">8. Always avoid</a></li>
+      </ul>
+    </nav>
+
+    <h2 id="purpose-scope">1. Purpose &amp; scope</h2>
+    <p>The PL Infra Prompt Library is the canonical home for AI prompts shared across PL Infra. It exists so we (a) avoid reinventing prompts across teams, (b) keep a record of what works, and (c) raise the floor on prompt quality across functions. Every team — legal, finance, capital, operations, product, comms, and infra — is encouraged to contribute.</p>
+    <p>How to use the library:</p>
+    <ul>
+      <li>Treat each entry as a reusable building block. Copy, adapt, and credit.</li>
+      <li>Add new prompts under the appropriate category. If a prompt spans categories, file it under the primary use case and add tags for the others.</li>
+      <li>Mark a prompt as <strong>Draft</strong> when first added; promote to <strong>Approved</strong> after at least one other person has tested it.</li>
+      <li>Retire prompts that are stale, redundant, or no longer reflect best practice — they move to the archive rather than getting deleted.</li>
+    </ul>
+    <p><strong>Organization:</strong> we use category sections with a Category tag on every entry rather than separate documents per function, so prompts that bridge functions (e.g., a meeting briefing that touches both legal and ops) stay discoverable. Each prompt also carries free-form tags for cross-cutting use cases.</p>
+
+    <h2 id="how-to-contribute">2. How to contribute</h2>
+    <p>Submitting a prompt takes about two minutes:</p>
+    <ol>
+      <li>Click <strong><a href="./add-prompt.html">Add a prompt</a></strong> in the topbar.</li>
+      <li>Fill in the fields. Required: title, category, sensitivity, use case, audience, recommended model, inputs, prompt text, example output, author. Optional: tags, connectors / tools used, skill or plugin it pairs with, notes.</li>
+      <li>Click <strong>Submit for review</strong>. The form opens a pre-filled GitHub issue. Submit the issue — an automated workflow turns it into a pull request for the library maintainer to review.</li>
+      <li>Once merged, the prompt appears in the library on the next deploy (usually within a minute).</li>
+    </ol>
+    <p><strong>Promotion from Draft → Approved.</strong> A prompt is ready to be promoted when:</p>
+    <ul>
+      <li>It has run successfully on at least two different inputs.</li>
+      <li>The example output reflects the kind of result a teammate should actually expect.</li>
+      <li>The sensitivity tier is set and matches the data the prompt is designed to consume.</li>
+      <li>A second person (not the author) has tested it and confirmed it works.</li>
+    </ul>
+    <p><strong>Deprecation.</strong> Prompts get retired when a better version exists, the underlying workflow has changed, or the tool the prompt depends on is no longer available. Move the entry to the archive with a one-line note explaining why.</p>
+    <p><strong>Style.</strong> Prompts should be verbatim — what you would actually paste into the model. Use <code>{{placeholders}}</code> for variable inputs rather than hard-coded examples. Keep example outputs short (3–5 lines). Cite the model version you tested with if behavior is model-sensitive. Never include real confidential data in example inputs or outputs — use synthetic or fully redacted placeholders.</p>
+
+    <h2 id="sensitivity-classifications">3. Sensitivity classifications</h2>
+    <p>Every prompt entry carries a sensitivity tag. <strong>A prompt's tier is set by its inputs, not its outputs</strong> — a summarization prompt is L4 if the document being summarized is privileged, even if the prompt text itself looks harmless. When uncertain, default to one tier higher and downgrade after review.</p>
+
+    <h3>L1 — Public</h3>
+    <ul>
+      <li><strong>Data:</strong> Published material, marketing copy, public regulations, public grant criteria, anything already on the open web.</li>
+      <li><strong>Approved tools:</strong> Any AI tool.</li>
+      <li><strong>Approvals:</strong> None.</li>
+      <li><strong>Handling:</strong> No restrictions. Outputs may be shared broadly.</li>
+    </ul>
+
+    <h3>L2 — Internal</h3>
+    <ul>
+      <li><strong>Data:</strong> PL Infra working docs, internal Notion pages, draft memos, OKR notes, non-sensitive Slack content, anonymized vendor names, aggregate budget figures.</li>
+      <li><strong>Approved tools:</strong> Claude (Cowork, claude.ai), Gemini for Workspace, Notion AI, Ironclad, Perplexity, ChatGPT Enterprise. No personal or free-tier accounts.</li>
+      <li><strong>Approvals:</strong> None — but use an approved tool.</li>
+      <li><strong>Handling:</strong> Don't post outputs externally without review.</li>
+    </ul>
+
+    <h3>L3 — Confidential</h3>
+    <ul>
+      <li><strong>Data:</strong> Identified third parties, unredacted contracts and NDAs, applicant financials, draft legal memos, cell-level financials not yet published, employee comp/PII, grant applicant identities pre-publication, MNPI-adjacent material.</li>
+      <li><strong>Approved tools:</strong> Claude (Enterprise / Cowork) and Ironclad only. Not ChatGPT free tier, Gemini consumer, or Perplexity for these inputs.</li>
+      <li><strong>Approvals:</strong> Prompt author or matter DRI. Legal sign-off if the data came from outside counsel or is subject to a confidentiality undertaking.</li>
+      <li><strong>Handling:</strong> Strip identifiers when the task allows. Don't paste into shared chats viewable beyond need-to-know. Note required redactions in the prompt's Inputs field.</li>
+    </ul>
+
+    <h3>L4 — Restricted</h3>
+    <ul>
+      <li><strong>Data:</strong> Attorney-client privileged communications, litigation-hold material, regulatory inquiries, M&amp;A or financing-deal terms pre-announcement, raw KYC packages, government IDs, banking / wire credentials, API keys or secrets, agreements with third-party confidentiality provisions that prohibit AI use.</li>
+      <li><strong>Approved tools:</strong> Human review by default. AI use requires explicit per-matter sign-off from legal plus confirmation that retention, training opt-out, and data residency posture support the input.</li>
+      <li><strong>Approvals:</strong> Theresa (or senior counsel) + matter DRI. Document the approval in the prompt's Notes field with date and matter ID.</li>
+      <li><strong>Handling:</strong> Never paste raw data into a library entry as an example — use synthetic or fully redacted placeholders. Outputs are confidential by default.</li>
+    </ul>
+
+    <p><strong>Parameters that travel with each sensitivity tag:</strong> tool whitelist, retention requirement, redaction guidance, approver / escalation path, logging (especially for L3 / L4 audit trails). Two rules of thumb: a prompt's tier is set by its inputs; default to one tier higher when uncertain.</p>
+
+    <h2 id="golden-formula">4. The Golden Prompting Formula</h2>
+    <p><strong>ROLE + CONTEXT + TASK + FORMAT = Great Output.</strong> Most of us do this intuitively. Doing it consistently is what separates a great prompt from a mediocre one.</p>
+
+    <div class="golden-box">
+      <span class="formula-chip">ROLE</span>
+      <span class="formula-op">+</span>
+      <span class="formula-chip">CONTEXT</span>
+      <span class="formula-op">+</span>
+      <span class="formula-chip">TASK</span>
+      <span class="formula-op">+</span>
+      <span class="formula-chip">FORMAT</span>
+      <span class="formula-eq">=</span>
+      <span class="formula-out">Great Output</span>
+    </div>
+
+    <ul>
+      <li><strong>ROLE</strong> — who should the AI be? <em>"You are a legal counsel specializing in vendor agreements…"</em></li>
+      <li><strong>CONTEXT</strong> — what's the situation? <em>"We received a KYC request from Counterparty X asking for…"</em></li>
+      <li><strong>TASK</strong> — what exactly do you need? <em>"Draft a response providing only the required documents…"</em></li>
+      <li><strong>FORMAT</strong> — how should it look? <em>"Respond in 3 paragraphs, professional tone, under 200 words."</em></li>
+    </ul>
+
+    <h2 id="reusable-template">5. A reusable template for high-stakes prompts</h2>
+    <p>For complex, repeatable work — diligence reviews, multi-step analyses, anything you'll run more than once — use this three-step structure:</p>
+
+    <div class="step-box">
+      <div class="step-label">Step 1</div>
+      <h3 class="step-title">Scope</h3>
+      <div class="step-text">As an (EXPERT_TYPE) with a background in (EXPERTISE_TYPES), and in consideration of the following context (INDUSTRIES, COUNTRIES, BUSINESS_CONTEXT, PRIOR_ANALYSIS), analyze the following (CONTENT_SOURCES) for (DESIRED_PATTERNS). While analyzing, alert the following (HUMAN_ROLES) via the following (ALERT_METHODS AND ANALYSIS_CONTEXT) when specific human expertise could meaningfully improve analysis. Once the analysis is complete, store it in the (ANALYSIS_REPOSITORY).</div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-label">Step 2</div>
+      <h3 class="step-title">Precision</h3>
+      <div class="step-text">Document and retain your sources, citations, and reasoning for all actions associated with each step.</div>
+    </div>
+
+    <div class="step-box">
+      <div class="step-label">Step 3</div>
+      <h3 class="step-title">Internal Process Improvement</h3>
+      <div class="step-text">Recommend improvements to this workflow such as qualitative inclusion of more context and content source for more accurate and desired outcomes. Make recommendations on how analysis is conducted so that overall analyses trend up in quality over time. Include any specific recommendations for improving analysis efficiency, context richness, and the preservation of accurate data provenance and citation.</div>
+    </div>
+
+    <p>Save the populated version of this template back to the library when you find one that works well — it makes the library compound in value over time.</p>
+
+    <h2 id="six-techniques">6. Six techniques that separate power users</h2>
+
+    <div class="technique-grid">
+      <div class="technique">
+        <div class="technique-num">1</div>
+        <h3>Be specific about constraints</h3>
+        <p>Tell the AI what NOT to include. <em>"Do not share our EIN, bank details, or ownership structure unless explicitly required."</em></p>
+      </div>
+      <div class="technique">
+        <div class="technique-num">2</div>
+        <h3>Reference attached documents</h3>
+        <p>Use <code>@</code> to attach files and say <em>"Using the attached [document name], draft…"</em> This grounds the AI in your actual content.</p>
+      </div>
+      <div class="technique">
+        <div class="technique-num">3</div>
+        <h3>Iterate, don't restart</h3>
+        <p>If the output is close but not right, say <em>"Revise paragraph 2 to be more formal"</em> or <em>"Shorten this to 3 bullet points."</em> Build on what's good. When you find a better way to ask mid-conversation, tell the model to update its working instructions and save the new version back to the library.</p>
+      </div>
+      <div class="technique">
+        <div class="technique-num">4</div>
+        <h3>Specify your audience</h3>
+        <p><em>"This goes to a sophisticated institutional investor"</em> vs. <em>"This is for a fund admin's compliance team."</em> The AI calibrates tone and depth accordingly.</p>
+      </div>
+      <div class="technique">
+        <div class="technique-num">5</div>
+        <h3>Ask for a plan first</h3>
+        <p>For complex tasks: <em>"Before drafting, list the key points you'll cover and flag any gaps in the information I've given you."</em> Approve the outline, then say <em>"Proceed."</em> Bonus: ask the model to suggest improvements to your prompt before it runs.</p>
+      </div>
+      <div class="technique">
+        <div class="technique-num">6</div>
+        <h3>Request sources</h3>
+        <p>Ask the AI to cite its sources so you can quickly identify where (if at all) it is hallucinating. <em>"If you are uncertain about a citation, say so explicitly rather than guessing."</em> <em>"Don't invent citations — if you don't have a source, mark the claim [UNCITED]."</em></p>
+      </div>
+    </div>
+
+    <h2 id="tool-reference">7. Quick reference — which tool for what</h2>
+
+    <div class="tool-row">
+      <div class="tool-name">Claude AI / Cowork</div>
+      <div class="tool-desc">Contracts, memos, research drafts, special projects. Change the chat model to fit your use case (Opus for analysis, Sonnet for drafting, Haiku for high-volume classification).</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-name">Gemini for Workspace</div>
+      <div class="tool-desc">Email drafts, KYC responses, doc summaries, team comms.</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-name">ChatGPT</div>
+      <div class="tool-desc">Brainstorming, research, complex analysis. Use extended thinking mode for best results.</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-name">Ironclad</div>
+      <div class="tool-desc">Contract drafting, redlining, clause library management.</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-name">Notion AI</div>
+      <div class="tool-desc">Meeting notes, trackers, process docs, checklists.</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-name">Perplexity</div>
+      <div class="tool-desc">Real-time research, cited web sources, quick fact-finding.</div>
+    </div>
+
+    <h2 id="always-avoid">8. Always avoid</h2>
+    <ul class="avoid-list">
+      <li><strong>Pasting confidential data into non-approved tools</strong> that have not been vetted by PLCS / SEAD.</li>
+      <li><strong>Sending AI output without human review.</strong></li>
+      <li><strong>Vague asks</strong> — use precise verbs: <em>draft, summarize, extract, compare.</em></li>
+      <li><strong>Assuming context carries over</strong> — reset each session or create a Project.</li>
+    </ul>
+
+    <footer class="page-footer" style="margin-top: var(--space-9);">
+      <p>Have a technique that should be on this page? Open an issue on the repo or message the library maintainer.</p>
+    </footer>
+  </main>
+
+  <script>
+    (function () {
+      var saved = localStorage.getItem("prompt-lib-theme");
+      if (saved) document.documentElement.setAttribute("data-theme", saved);
+      document.getElementById("themeToggle").addEventListener("click", function () {
+        var cur = document.documentElement.getAttribute("data-theme") || "light";
+        var next = cur === "light" ? "dark" : "light";
+        document.documentElement.setAttribute("data-theme", next);
+        localStorage.setItem("prompt-lib-theme", next);
+      });
+    })();
+  </script>
+</body>
+</html>
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,240 @@
+// Auto-generated from prompts.json — the source of truth.
+// Lets the site load over file:// without a server. Regenerate when prompts.json changes.
+window.PROMPTS = {
+  "categories": [
+    "Budget",
+    "Cross-functional",
+    "Document Review",
+    "Finance",
+    "Investments",
+    "Legal",
+    "MarComms",
+    "Project Management",
+    "Vendor Negotiation"
+  ],
+  "prompts": [
+    {
+      "id": "legal-nda-triage",
+      "title": "NDA first-pass triage",
+      "category": "Legal",
+      "use_case": "Classify an incoming NDA as Green (standard), Yellow (counsel review), or Red (full legal review) before deeper work.",
+      "audience": "Legal team, BD/sales who route NDAs",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "Gmail, Google Drive",
+      "inputs": "The NDA text (paste or attach)",
+      "prompt": "You are a senior commercial lawyer triaging an incoming NDA. Classify it as GREEN (standard approval), YELLOW (counsel review), or RED (full legal review). Then list each clause that triggered your classification, quoting the language and explaining the concern in one sentence. Flag specifically: embedded non-solicits, non-competes, residual-knowledge clauses, IP assignment provisions, term/survival longer than 3 years, unilateral indemnities, and choice of law outside our standard jurisdictions. End with three short questions you would send back to the requester.\n\nNDA:\n{{nda_text}}",
+      "example": "Classification: YELLOW. Triggered by §4 (3-year survival) and §7 (non-solicit of employees for 12 months). Suggested questions: (1) Can survival be reduced to 2 years? (2) Is the non-solicit limited to employees with whom we had direct contact?...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L3",
+      "tags": [
+        "NDA",
+        "triage",
+        "contracts"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "legal-contract-redline",
+      "title": "Contract redline against playbook",
+      "category": "Legal",
+      "use_case": "Compare a vendor or customer contract against our negotiation playbook and produce a prioritized redline.",
+      "audience": "Legal team",
+      "model": "Claude Opus 4.6",
+      "connectors": "Google Drive, Ironclad",
+      "inputs": "Contract text + playbook reference",
+      "prompt": "Act as a contracts attorney. Review the attached agreement against the playbook positions provided. For each material deviation, output: (1) section reference, (2) current language, (3) the playbook position, (4) suggested redline, (5) fallback position if the counterparty pushes back, and (6) business impact (low/medium/high) with a one-sentence rationale. Then write a short executive summary (max 5 bullets) for the deal owner. Cite the section number for every redline.\n\nContract:\n{{contract_text}}\n\nPlaybook:\n{{playbook_text}}",
+      "example": "§7.2 Indemnity — current language is mutual but uncapped. Playbook position: cap at fees paid in trailing 12 months. Suggested redline: insert \"in no event shall either party's aggregate liability exceed...\" Fallback: 2x fees. Business impact: High.",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L3",
+      "tags": [
+        "contracts",
+        "redline",
+        "playbook"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "legal-compliance-check",
+      "title": "Compliance check — proposed feature or initiative",
+      "category": "Legal",
+      "use_case": "Surface applicable regulations, required approvals, and risk areas before a feature or initiative ships.",
+      "audience": "Legal team, product, ops",
+      "model": "Claude Opus 4.6",
+      "connectors": "",
+      "inputs": "Description of the feature/initiative; jurisdictions of operation",
+      "prompt": "You are a regulatory counsel. The team is proposing: {{proposal}}. The jurisdictions involved are: {{jurisdictions}}. Identify (1) every regulatory regime that plausibly applies (privacy, securities, consumer protection, export, AI-specific, sector-specific), (2) required internal approvals, (3) the top three risk areas ranked by severity x likelihood, and (4) a suggested escalation path. For each item, cite the specific statute, regulation, or guidance document by name and section. If you are uncertain about a citation, say so explicitly rather than guessing.",
+      "example": "Applicable regimes: GDPR (Art. 6 lawful basis, Art. 35 DPIA likely required); EU AI Act (Art. 50 transparency obligations); US state privacy laws (CCPA §1798.140)...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Draft",
+      "sensitivity": "L2",
+      "tags": [
+        "compliance",
+        "regulatory",
+        "privacy"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "finance-cell-snapshot",
+      "title": "Cell budget snapshot",
+      "category": "Budget",
+      "use_case": "Quick where-do-we-stand summary for a Blue Funds cell (IPFS Core, IPFS Implementation, IPNI Core, libp2p Core).",
+      "audience": "PL Infra leads, cell stewards",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "Google Drive",
+      "inputs": "Access to the cell's budget workbook in Drive",
+      "prompt": "Pull the latest figures from the {{cell_name}} budget workbook. Produce a snapshot covering: opening balance for the current period, total commitments YTD, total disbursements YTD, current available balance, monthly burn rate (trailing 3 months), runway in months at current burn, and pipeline (grants under review by stage). Flag any line items that look anomalous compared to the prior period. Cite the tab and cell range for every number you report.",
+      "example": "IPFS Core — Available balance: $X (Workbook → Summary!B12). Trailing 3-mo burn: $Y/mo (Disbursements!E45:E47). Runway: ~N months. Anomaly: legal fees in April were 4x the trailing average...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L2",
+      "tags": [
+        "budget",
+        "cells",
+        "blue funds"
+      ],
+      "notes": "Pairs with the blue-funds-grant-ops:blue-funds-budget skill. Always insist on cell-range citations.",
+      "is_example": true
+    },
+    {
+      "id": "finance-oif-invoice",
+      "title": "OIF invoice → workbook row",
+      "category": "Finance",
+      "use_case": "Parse a monthly OIF invoice PDF into a paste-ready row for the OIF Fees Detail tab.",
+      "audience": "Finance ops",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "Google Drive",
+      "inputs": "OIF invoice PDF",
+      "prompt": "Extract from the attached OIF invoice: invoice number, invoice date, billing period, cell allocated to, line items (description + amount), subtotal, taxes, total. Output as a single tab-separated row matching the OIF Fees Detail tab schema. If any field is ambiguous, return the row but flag the field with [REVIEW] and explain why in a note below.",
+      "example": "2026-04-15  INV-2026-042  Apr 2026  IPFS Core  Management fee  $12,500.00  $0  $12,500.00 / [REVIEW] Billing period overlaps with March — confirm with OIF.",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L3",
+      "tags": [
+        "invoices",
+        "OIF",
+        "reconciliation"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "capital-grant-triage",
+      "title": "Grant application triage",
+      "category": "Investments",
+      "use_case": "First-pass review of an incoming grant application before it goes to advisory or memo drafting.",
+      "audience": "Grant ops, cell stewards",
+      "model": "Claude Opus 4.6",
+      "connectors": "Google Drive",
+      "inputs": "The application (PDF or text) + the cell's scope/criteria",
+      "prompt": "You are reviewing a grant application for the {{cell_name}} cell. The cell scope is: {{cell_scope}}. Produce a triage report with: (1) Fit summary — is this in scope? (2) Completeness — list every required field that is missing or thin. (3) Risk flags — team, financial, technical, reputational. (4) Three to five clarifying questions to send back to the applicant before advisory review. (5) Recommendation: ready for advisory / needs revision / decline. Cite the application section for every observation.",
+      "example": "Fit: In scope (libp2p protocol research). Completeness: Budget is present but does not break out personnel vs. infra costs (§5). Risk: Team has no prior libp2p contributions on record. Questions: (1) Can you share GitHub handles for the core team?...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L3",
+      "tags": [
+        "grants",
+        "triage",
+        "intake"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "capital-grant-memo",
+      "title": "Grant review memo draft",
+      "category": "Investments",
+      "use_case": "Draft a structured review memo following the OIF memo template once an application has cleared triage.",
+      "audience": "Cell stewards, advisors",
+      "model": "Claude Opus 4.6",
+      "connectors": "Google Drive, Notion",
+      "inputs": "Application + triage notes + any advisory feedback",
+      "prompt": "Draft a grant review memo for the {{cell_name}} cell following the OIF memo template. Use the application and triage notes provided. Sections: Summary, Applicant background, Scope of work, Budget & timeline, Strategic fit, Risks & mitigations, Advisory feedback, Recommendation. Keep the tone neutral and evidence-based. Every claim about the applicant or project should cite either the application section or the advisory note. Do not invent numbers or credentials.",
+      "example": "Summary: The applicant proposes a 9-month effort to... (App §1). Strategic fit: Aligns with KR 2.1 of the libp2p Core roadmap (Advisory note, 2026-05-12). Risks: Single-developer dependency (App §3 — only one named contributor)...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L3",
+      "tags": [
+        "grants",
+        "memos",
+        "review"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "ops-update-in-a-box",
+      "title": "Update-in-a-Box — Bi-weekly PL Infra Leads update",
+      "category": "Project Management",
+      "use_case": "Draft the bi-weekly PL Infra Leads update (OKR Progress + 2-Week Outlook) for any PL Infra team.",
+      "audience": "Any PL Infra team lead",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "Notion, Slack, Google Drive, Gmail",
+      "inputs": "team-config.yaml (KRs, DRIs, outlook buckets) + source notes + the prior bi-weekly update",
+      "prompt": "Draft this cycle's PL Infra Leads bi-weekly update for the {{team_name}} team.\n\nLoad team-config.yaml from my working folder for the team's active KRs, DRIs, and outlook buckets. If it is missing, ask the first-time setup questions and offer to save my answers.\n\nGather inputs from whichever of these I have pointed you at: pasted notes, attached files, Notion (notion-search / notion-fetch), Slack (slack_search), Drive, Gmail.\n\nRender the draft in chat as markdown using this structure:\n\n## Bi-Weekly PL Infra Leads Update — <Team> — <Date Range>\n\n### OKR Progress Updates (Last 2 Weeks)\n**🟢 KR1: <title>** — On Track\n- <bullet>\n\n**🟡 KR2: <title>** — Slightly Behind\n- <bullet>\n\n### 2-Week Outlook\n**<Bucket>**\n- <bullet>\n\n**Asks** (only if any)\n- <ask>\n\nFor each KR: status emoji first; 1–3 bullets on what changed; credit DRIs; quote concrete numbers; say \"No change since last update\" rather than dropping a KR. For any sensitive item use *[Placeholder: …]*. Do not fabricate timing or numbers.",
+      "example": "## Bi-Weekly PL Infra Leads Update — PLCS — May 19–Jun 1, 2026\n\n**🟢 KR1: Close Q2 vendor diligence backlog** — On Track\n- 6 of 8 outstanding NDAs cleared through triage; remaining 2 in counsel review (Theresa).\n\n**🟡 KR2: Roll out AI prompt library to PL Infra** — Slightly Behind\n- Library deployed with 8 approved prompts; adoption tracking deferred *[Placeholder: dashboards pending]*.",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Approved",
+      "sensitivity": "L2",
+      "tags": [
+        "updates",
+        "OKRs",
+        "bi-weekly",
+        "leads-meeting",
+        "update-in-a-box"
+      ],
+      "notes": "Public skill at https://github.com/protocol/update-in-a-box — installable as a .skill bundle in Cowork.",
+      "is_example": false
+    },
+    {
+      "id": "ops-meeting-briefing",
+      "title": "Meeting briefing",
+      "category": "Project Management",
+      "use_case": "Pre-meeting brief covering attendees, prior context, open items, and suggested talking points.",
+      "audience": "Anyone heading into a high-stakes meeting",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "Notion, Google Drive",
+      "inputs": "Meeting title, attendees, prior thread or email history",
+      "prompt": "I have a meeting titled \"{{meeting_title}}\" with {{attendees}}. The relevant prior context is: {{context}}. Produce a briefing with: (1) one-paragraph background, (2) what each attendee likely wants out of this meeting, (3) open items from the last conversation, (4) three to five suggested talking points or questions I should raise, (5) any legal/compliance/financial implications I should be aware of. Flag anything you are uncertain about.",
+      "example": "Background: Renewal discussion for the vendor MSA signed in 2024... Attendee goals: Vendor PM likely wants to expand scope; their counsel will want to keep liability cap. Open items: indemnity language flagged in last email...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Draft",
+      "sensitivity": "L2",
+      "tags": [
+        "meetings",
+        "prep"
+      ],
+      "is_example": true
+    },
+    {
+      "id": "ops-leadership-update",
+      "title": "Internal comms — leadership update",
+      "category": "MarComms",
+      "use_case": "Convert a working set of notes or bullets into a polished leadership-ready update in PL Infra format.",
+      "audience": "Anyone writing up the team",
+      "model": "Claude Sonnet 4.6",
+      "connectors": "",
+      "inputs": "Bullet-point notes covering wins, risks, asks",
+      "prompt": "Convert the following notes into a leadership update in our standard format: (1) Headline (one sentence), (2) Wins (max 3 bullets), (3) Risks (max 3 bullets, each with a proposed mitigation), (4) Asks (specific decisions or resources needed, each with an owner and a deadline). Tone: confident, evidence-based, no hedging. If a bullet lacks supporting evidence, flag it for me to fill in rather than inventing one.\n\nNotes:\n{{notes}}",
+      "example": "Headline: PL Infra closed Q2 with all four cells on track and three new grants in pipeline. Wins: ... Risks: ... Asks: Approve $X additional headcount for legal ops by 6/15...",
+      "author": "Theresa Therriault",
+      "updated": "2026-06-01",
+      "status": "Draft",
+      "sensitivity": "L2",
+      "tags": [
+        "comms",
+        "leadership",
+        "updates"
+      ],
+      "is_example": true
+    }
+  ]
+};

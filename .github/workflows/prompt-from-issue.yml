@@ -1,0 +1,139 @@
+name: Prompt from Issue → PR
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  add-prompt:
+    if: contains(github.event.issue.labels.*.name, 'add-prompt')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse, validate, insert, PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issue = context.payload.issue;
+            const body = issue.body || '';
+
+            // Extract JSON between the markers.
+            const start = body.indexOf('<!-- prompt-json-start -->');
+            const end = body.indexOf('<!-- prompt-json-end -->');
+            let raw = '';
+            if (start !== -1 && end !== -1) {
+              raw = body.slice(start, end);
+            } else {
+              raw = body;
+            }
+            // Pull from a ```json fenced block.
+            const m = raw.match(/```json\s*([\s\S]+?)```/);
+            if (!m) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "❌ I couldn't find a ```json fenced block in this issue. Please re-submit via the Add a prompt form, or edit this issue to include the JSON block."
+              });
+              return;
+            }
+
+            let entry;
+            try {
+              entry = JSON.parse(m[1]);
+            } catch (e) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "❌ The JSON block didn't parse: `" + e.message + "`. Please fix the JSON and re-open this issue (or re-submit via the form)."
+              });
+              return;
+            }
+
+            // Required fields.
+            const required = ['title', 'category', 'use_case', 'audience', 'model', 'inputs', 'prompt', 'example', 'author', 'sensitivity'];
+            const missing = required.filter(k => !entry[k] || String(entry[k]).trim() === '');
+            if (missing.length) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "❌ Missing required field(s): `" + missing.join(', ') + "`. Please re-submit with these filled in."
+              });
+              return;
+            }
+
+            // Enums.
+            const allowedCats = ['Budget','Cross-functional','Document Review','Finance','Investments','Legal','MarComms','Project Management','Vendor Negotiation'];
+            const allowedSens = ['L1','L2','L3','L4'];
+            const allowedStatus = ['Draft','Approved','Deprecated'];
+            if (!allowedCats.includes(entry.category)) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "❌ Category `" + entry.category + "` is not in the allowed list: " + allowedCats.join(', ')
+              });
+              return;
+            }
+            if (!allowedSens.includes(entry.sensitivity)) {
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "❌ Sensitivity `" + entry.sensitivity + "` is not in the allowed list: L1, L2, L3, L4"
+              });
+              return;
+            }
+            if (entry.status && !allowedStatus.includes(entry.status)) entry.status = 'Draft';
+            if (!entry.status) entry.status = 'Draft';
+            if (!entry.updated) entry.updated = new Date().toISOString().slice(0, 10);
+            if (!entry.id) {
+              const slug = String(entry.title).toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-').slice(0, 50);
+              entry.id = entry.category.toLowerCase() + '-' + slug;
+            }
+            if (!Array.isArray(entry.tags)) entry.tags = entry.tags ? [entry.tags] : [];
+
+            // Load prompts.json, check id uniqueness, insert.
+            const dataPath = path.join('preview', 'prompts.json');
+            const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+            if (data.prompts.some(p => p.id === entry.id)) {
+              entry.id = entry.id + '-' + Date.now().toString().slice(-6);
+            }
+            data.prompts.push(entry);
+            fs.writeFileSync(dataPath, JSON.stringify(data, null, 2) + '\n');
+
+            // Branch + commit + PR.
+            const branch = 'add-prompt/' + entry.id;
+            const sha = await exec.getExecOutput('git', ['rev-parse', 'HEAD']);
+            await exec.exec('git', ['config', 'user.name', 'github-actions[bot]']);
+            await exec.exec('git', ['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com']);
+            await exec.exec('git', ['checkout', '-b', branch]);
+            await exec.exec('git', ['add', dataPath]);
+            await exec.exec('git', ['commit', '-m', 'Add prompt: ' + entry.title + ' (#' + issue.number + ')']);
+            await exec.exec('git', ['push', '-u', 'origin', branch]);
+
+            const pr = await github.rest.pulls.create({
+              ...context.repo,
+              title: 'Add prompt: ' + entry.title,
+              head: branch,
+              base: context.payload.repository.default_branch || 'main',
+              body: 'Submitted via issue #' + issue.number + ' by **' + entry.author + '**.\n\n'
+                  + '- **Category:** ' + entry.category + '\n'
+                  + '- **Sensitivity:** ' + entry.sensitivity + '\n'
+                  + '- **Status:** ' + entry.status + '\n\n'
+                  + 'Once merged, the prompt appears in the live library on the next GitHub Pages deploy.\n\n'
+                  + 'Closes #' + issue.number
+            });
+
+            await github.rest.issues.createComment({
+              ...context.repo, issue_number: issue.number,
+              body: '✅ Opened PR #' + pr.data.number + ' — `' + entry.title + '` will appear in the library once it's reviewed and merged.\n\nPR: ' + pr.data.html_url
+            });
+
+            await github.rest.issues.update({
+              ...context.repo, issue_number: issue.number, state: 'closed'
+            });
